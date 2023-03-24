@@ -8,7 +8,7 @@ class LeftPane(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent  # store the instance of DragDrop class as an instance variable
-
+        #comment
 
         self.setAcceptDrops(True)
 

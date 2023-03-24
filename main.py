@@ -31,7 +31,7 @@ class FileReader(QThread):
                 progress += len(chunk)
                 self.progressChanged.emit(progress)
 
-                  # simulate some processing time
+
 
 
 class LeftPane(QWidget):
