@@ -1,66 +1,150 @@
-from PySide2.QtCore import Qt, QThread, Signal
-from PySide2.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QFileDialog, QAction, QProgressBar, \
-    QMenuBar, QHBoxLayout, QScrollArea
-import time
 import sys
+from PySide2.QtCore import Qt
+from PySide2.QtWidgets import QApplication, QMainWindow,QScrollArea, QWidget, QLabel, QVBoxLayout, QFileDialog, QAction, \
+    QTabWidget, QHBoxLayout, QCheckBox, QFrame, QPushButton, QSizePolicy
 
-
-class FileReader(QThread):
-    progressChanged = Signal(int)
-    textChanged = Signal(str)
-
-    def __init__(self, file_path, parent=None):
-        super().__init__(parent)
-        self.file_path = file_path
-
-    def run(self):
-        with open(self.file_path, 'r', encoding='utf-8') as f:
-            file_size = len(f.read())
-            f.seek(0)  # reset the file pointer to the beginning of the file
-            chunk_size = 1024
-            progress = 0
-
-            while True:
-                chunk = f.read(chunk_size)
-
-                if not chunk:
-                    break
-                    print("completed")
-
-                self.textChanged.emit(chunk)
-                progress += len(chunk)
-                self.progressChanged.emit(progress)
+from PySide2.QtGui import QPixmap
 
 
 
-
-class LeftPane(QWidget):
+class Scan_n_Edit(QLabel):
     def __init__(self, parent):
         super().__init__(parent)
-        self.parent = parent  # store the instance of DragDrop class as an instance variable
+        self.parent = parent
 
+        button_layout = QHBoxLayout()
+
+
+        scan_button = QPushButton("Scan File", self)
+        edit_button = QPushButton("Edit", self)
+
+        scan_button.setMinimumSize(165, 40)
+
+        scan_button.setMaximumSize(165, 40)
+        edit_button.setMinimumSize(40, 40)
+        edit_button.setMaximumSize(40, 40)
+
+
+
+        button_layout.setContentsMargins(0, 0, 0, 0)
+        button_layout.setSpacing(0)
+
+
+        button_layout.addWidget(edit_button)
+        button_layout.addWidget(scan_button)
+
+
+
+
+
+
+        # Set the layout of the widget to the button layout
+        self.setLayout(button_layout)
+
+
+
+
+
+class Filter_Block(QLabel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setStyleSheet("border: 2px solid black")
+        self.filter_element = Filter_tag(self)
+        vbox = QVBoxLayout(self)
+        vbox.addWidget(self.filter_element)
+        self.setLayout(vbox)
+
+
+        self.setMinimumSize(204, 400)
+        self.setMaximumSize(204, 400)
+        vbox.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+
+        #controll the expanding or fixed scaling behiour of the cchild widget
+
+
+
+
+
+class Filter_tag(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setStyleSheet("border: none;")
+        self.parent = parent
+        self.checkbox_layout = QVBoxLayout()
+        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
+
+        # create button and add it to new layout
+
+
+        self.main_layout = QVBoxLayout(self)
+        self.main_layout.addLayout(self.checkbox_layout)
+
+        vbox = QVBoxLayout(self)
+        vbox.addLayout(self.checkbox_layout)
+        vbox.setAlignment(Qt.AlignLeft)
+        self.setLayout(vbox)
+
+
+class Pannel_Data_DragnDrop(QWidget):
+
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        self.parent = parent
+
+        self.setStyleSheet("border: 2px solid black")
+
+
+        self.text_label = QLabel()
+
+        # create a QPixmap object with the image file
+        pixmap = QPixmap(r'C:\Users\athul\PycharmProjects\Log_Analyser\thumbnail\img.png')
+
+        # set the background image for the QLabel
+        self.text_label.setPixmap(pixmap)
+
+        # set the alignment of the label to center
+        self.text_label.setAlignment(Qt.AlignLeft)
+
+        # create a vertical box layout and add the label to it
+        vbox = QVBoxLayout()
+
+
+        # set the alignment of the vbox to the top
+        vbox.setAlignment(Qt.AlignLeft)
+
+        # set the layout of the widget to the vertical box layout
+
+
+        # set the widget's minimum size to the size of the pixmap
+        self.setMinimumSize(pixmap.size())
+
+        # allow the widget to accept drops
         self.setAcceptDrops(True)
 
-        self.label = QLabel("Drag and drop files here")
-        self.label.setAlignment(Qt.AlignCenter)
-
-        self.setMinimumWidth(200)
-        self.setMaximumWidth(200)
-
-        self.label.setMinimumWidth(200)
-        self.label.setMaximumWidth(200)
-        self.label.setStyleSheet("background-color: lightblue")
-
-        self.progress_bar = QProgressBar(self)
-
-        self.progress_bar.setMinimumWidth(200)
-        self.progress_bar.setMaximumWidth(200)
-
         vbox = QVBoxLayout()
-        vbox.addWidget(self.label)
-        vbox.addWidget(self.progress_bar)
-
+        vbox.setContentsMargins(0, 0, 0, 0)
+        vbox.setSpacing(0)
+        vbox.addWidget(self.text_label)
         self.setLayout(vbox)
+
+        vbox.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+
+
+
+
+
+
+
+
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -68,36 +152,94 @@ class LeftPane(QWidget):
         else:
             event.ignore()
 
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.setDropAction(Qt.CopyAction)
+            event.accept()
+        else:
+            event.ignore()
+
     def dropEvent(self, event):
-        for url in event.mimeData().urls():
-            file_path = str(url.toLocalFile())
+        if event.mimeData().hasUrls():
+            event.setDropAction(Qt.CopyAction)
+            event.accept()
 
-            self.progress_bar.setMaximum(0)
-            self.progress_bar.setValue(0)
+            for url in event.mimeData().urls():
+                file_path = str(url.toLocalFile())
 
-            reader = FileReader(file_path, self)
-            reader.progressChanged.connect(self.progress_bar.setValue)
-            reader.textChanged.connect(lambda text: self.parent.right_pane.text_label.setText(
-                self.parent.right_pane.text_label.text() + text))
+                # read the contents of the file and set the text of the parent's right_pane QLabel widget
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    text = f.read()
+                    self.parent.right_pane.text_label.setText(text)
 
-            reader.start()
+                # update the filename in the parent's left_pane QLabel widget
+                filename = file_path.split('/')[-1]
+                self.parent.left_pane.label.setText(filename)
+        else:
+            event.ignore()
 
-            filename = file_path.split('/')[-1]
-            self.parent.left_pane.label.setText(filename)
 
-        print("done")
+class Pannel1_Left(QWidget):
 
-
-class RightPane(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
+
+        self.parent = parent
+
+
+
+        self.dragndrop = Pannel_Data_DragnDrop(self)
+        self.filter_block = Filter_Block(self)
+        self.scan_edit = Scan_n_Edit(self)
+
+
+
+
+        vbox = QVBoxLayout(self)
+
+        vbox.addWidget(self.dragndrop)
+        self.dragndrop.setContentsMargins(0, 0, 0, 0)
+        self.dragndrop.layout().setSpacing(0)
+
+        vbox.addWidget(self.filter_block)
+        self.filter_block.setContentsMargins(0, 0, 0, 0)
+        self.filter_block.layout().setSpacing(0)
+
+        vbox.addWidget(self.scan_edit)
+        self.scan_edit.setContentsMargins(0, 0, 0, 0)
+        self.scan_edit.layout().setSpacing(0)
+
+        vbox.setContentsMargins(0, 0, 0, 0)
+        vbox.setSpacing(0)
+        vbox.setAlignment(Qt.AlignTop)
+
+        self.setMinimumSize(204, 900)
+        self.setMinimumSize(204, 900)
+
+
+
+
+
+
+
+
+
+
+
+
+        self.setLayout(vbox)
+
+class Pannel1_Right(QWidget):
+    def __init__(self, parent):
+
+        super().__init__(parent)
+        #border
+        self.setStyleSheet("border: 1px solid black;")
+
         self.parent = parent
 
         self.text_label = QLabel()
-
-        self.text_label.setMinimumWidth(1000)
-        self.text_label.setMaximumWidth(1000)
-        self.text_label.setStyleSheet
+        self.text_label.setStyleSheet("background-color: lightgreen")
 
         # create a scroll area and set the text label as its widget
         scroll_area = QScrollArea()
@@ -105,40 +247,134 @@ class RightPane(QWidget):
         scroll_area.setWidget(self.text_label)
 
         hbox = QHBoxLayout()
+
+        hbox.setContentsMargins(0, 0, 0, 0)
+        hbox.setSpacing(0)
         hbox.addWidget(scroll_area)
+
+
+
+
         self.setLayout(hbox)
 
 
+        hbox.setAlignment(Qt.AlignTop | Qt.AlignLeft)
 
-class DragDrop(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Drag and Drop")
-        self.setGeometry(10, 30, 1000, 600)
 
-        self.left_pane = LeftPane(self)
-        self.right_pane = RightPane(self)
+
+
+class Panel1(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        self.left_pane = Pannel1_Left(self)
+        self.right_pane = Pannel1_Right(self)
 
         hbox = QHBoxLayout()
+
+
+
+
         hbox.addWidget(self.left_pane)
         hbox.addWidget(self.right_pane)
 
         vbox = QVBoxLayout()
-        menu_bar = QMenuBar(self)
-        vbox.addWidget(menu_bar)
         vbox.addLayout(hbox)
 
         self.setLayout(vbox)
 
-        self.create_menu(menu_bar)
 
-    def create_menu(self, menu_bar):
+
+class Panel2(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        panels = []
+        for i in range(6):
+            panel = QWidget()
+            panel.setStyleSheet(f"background-color: rgb({i*20}, {255-i*20}, {i*40})")
+            layout = QVBoxLayout()
+            layout.addWidget(QLabel(f"Panel {i+1}"))
+            panel.setLayout(layout)
+            panels.append(panel)
+
+        vbox = QVBoxLayout()
+        for i in range(2):
+            hbox = QHBoxLayout()
+            hbox.addWidget(panels[i*3])
+            hbox.addWidget(panels[i*3+1])
+            hbox.addWidget(panels[i*3+2])
+            vbox.addLayout(hbox)
+
+        self.setLayout(vbox)
+
+
+
+
+
+class Panel3(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        panels = []
+        for i in range(4):
+            panel = QWidget()
+            panel.setStyleSheet(f"background-color: rgb({i*60}, {255-i*40}, {i*80})")
+            layout = QVBoxLayout()
+            layout.addWidget(QLabel(f"Panel {i+1}"))
+            panel.setLayout(layout)
+            panels.append(panel)
+
+        vbox = QVBoxLayout()
+        hbox1 = QHBoxLayout()
+        hbox1.addWidget(panels[0])
+        hbox1.addWidget(panels[1])
+        vbox.addLayout(hbox1)
+        hbox2 = QHBoxLayout()
+        hbox2.addWidget(panels[2])
+        hbox2.addWidget(panels[3])
+        vbox.addLayout(hbox2)
+
+
+
+        self.setLayout(vbox)
+
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("Multi-Screen GUI")
+
+        menu_bar = self.menuBar()
         file_menu = menu_bar.addMenu("File")
 
         open_action = QAction("Open", self)
         open_action.triggered.connect(self.open_file)
 
         file_menu.addAction(open_action)
+
+        tab_widget = QTabWidget()
+        self.setCentralWidget(tab_widget)
+
+        self.panel1 = Panel1(self)
+        tab_widget.addTab(self.panel1, "Panel 1")
+
+        desktop = QApplication.desktop()
+        desktop_rect = desktop.geometry()
+
+        desktop_width = desktop_rect.width()
+        desktop_height = desktop_rect.height()
+
+        self.panel2 = Panel2(self)
+        tab_widget.addTab(self.panel2, "Panel 2")
+
+        self.panel3 = Panel3(self)
+        tab_widget.addTab(self.panel3, "Panel 3")
+
+        self.panel1.setMaximumSize(desktop_width-50, desktop_height-150)
+        self.panel2.setMaximumSize(desktop_width-50, desktop_height-150)
+        self.panel3.setMaximumSize(desktop_width-50, desktop_height-150)
 
     def open_file(self):
 
@@ -147,23 +383,26 @@ class DragDrop(QWidget):
         if file_path:
             with open(file_path, 'r', encoding='utf-8') as file:
                 text = file.read()
-                self.right_pane.text_label.setText(text)
+                self.panel1.left_pane.text_label.setText(text)
                 filename = file_path.split('/')[-1]
-                self.left_pane.label.setText(filename)
-
-
-
+                self.panel1.right_pane.text_label.setText(filename)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    window = MainWindow()
+    # Set the window's size to the screen size
+    desktop = QApplication.desktop()
 
-    window = DragDrop()
+    screen = QApplication.primaryScreen()
+    screen_rect = screen.geometry()
+
+    window.setGeometry(screen_rect)
 
     scroll_area = QScrollArea()
     scroll_area.setWidget(window)
-    scroll_area.setWidgetResizable(True)
-    scroll_area.setMinimumSize(1000, 600)
-    scroll_area.setMaximumSize(1000, 600)
+    scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+    scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
     scroll_area.show()
 
     sys.exit(app.exec_())

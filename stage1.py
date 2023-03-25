@@ -1,4 +1,4 @@
-import sys
+mport sys
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QFileDialog, QAction, QMenuBar, \
     QHBoxLayout, QScrollArea
@@ -18,7 +18,7 @@ class LeftPane(QWidget):
         self.label.setStyleSheet("background-color: lightblue")
 
         hbox = QHBoxLayout()
-        hbox.addWidget(self.label)
+        hbaox.addWidget(self.label)
         self.setLayout(hbox)
 
     def dragEnterEvent(self, event):
@@ -44,19 +44,22 @@ class LeftPane(QWidget):
 class RightPane(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
-        self.parent = parent
+        self.parent = parent  # store the instance of DragDrop class as an instance variable
+
 
         self.text_label = QLabel()
         self.text_label.setStyleSheet("background-color: lightgreen")
 
-        # create a scroll area and set the text label as its widget
+        self.text_label.setWordWrap(True)
+
         scroll_area = QScrollArea()
-        scroll_area.setWidgetResizable(True)
         scroll_area.setWidget(self.text_label)
 
         hbox = QHBoxLayout()
         hbox.addWidget(scroll_area)
         self.setLayout(hbox)
+
+
 
 class DragDrop(QWidget):
     def __init__(self):
@@ -109,11 +112,11 @@ if __name__ == '__main__':
 
     window = DragDrop()
 
-    scroll_area = QWidget()
+    scroll_area = QScrollArea()
     scroll_area.setWidget(window)
-    scroll_area.setWidgetResizable(False)
-
+    scroll_area.setWidgetResizable(True)
+    scroll_area.setMinimumSize(1000, 600)
     scroll_area.setMaximumSize(1000, 600)
-    scroll_area.show()
+    scroll_area.show()agdrop widget to ahve the scroll buttons
 
     sys.exit(app.exec_())
