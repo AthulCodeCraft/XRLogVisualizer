@@ -2,10 +2,12 @@ import sys
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QApplication, QMainWindow, QScrollArea, QWidget, QLabel, QVBoxLayout, QFileDialog, \
     QAction, \
-    QTabWidget, QHBoxLayout, QCheckBox, QFrame, QPushButton, QSizePolicy, QScrollBar
+    QTabWidget, QHBoxLayout, QCheckBox, QFrame, QPushButton, QSizePolicy, QScrollBar,QLineEdit
 
 from PySide2.QtGui import QPixmap
 
+import pyqtgraph as pg
+import log_read as lr
 
 class Scan_n_Edit(QLabel):
     def __init__(self, parent):
@@ -26,6 +28,11 @@ class Scan_n_Edit(QLabel):
         button_layout.setContentsMargins(0, 0, 0, 0)
         button_layout.setSpacing(0)
 
+        print("Scan use")
+        scan_button.clicked.connect(self.run_scan_function)
+        print("Scan done")
+
+
         button_layout.addWidget(edit_button)
         button_layout.addWidget(scan_button)
 
@@ -33,6 +40,23 @@ class Scan_n_Edit(QLabel):
 
         # Set the layout of the widget to the button layout
         self.setLayout(button_layout)
+
+
+
+    def run_scan_function(self):
+        print("Scan function action")
+        tag_list=[]
+        # to check the satus of the check box in the filter block
+        for checkbox in self.parent.filter_block.filter_element.checkbox_list:
+            if checkbox.isChecked():
+                tag_list.append(checkbox.text())
+
+
+        print(tag_list)
+
+
+
+
 
 
 class Filter_Block(QLabel):
@@ -63,46 +87,28 @@ class Filter_Block(QLabel):
 class Filter_tag(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
-        # self.setStyleSheet("border: 2px solid black")
         self.parent = parent
         self.checkbox_layout = QVBoxLayout()
-        self.checkbox_layout.addWidget(QCheckBox("FPS", self))
-        self.checkbox_layout.addWidget(QCheckBox("Battery Level", self))
-        self.checkbox_layout.addWidget(QCheckBox("Frame Repeat", self))
-        self.checkbox_layout.addWidget(QCheckBox("Bit Rate", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
-        self.checkbox_layout.addWidget(QCheckBox("Wifi Speed", self))
+        self.checkbox_list=[]
+        self.textbox_list=[]
+        checkbox_layout_list=[]
 
-        # create button and add it to new layout
+        for checkbox in range (0,14):
+            self.checkbox_list.append(QCheckBox(self))
+            self.textbox_list.append(QLineEdit(self))
+            self.textbox_list[-1].setText("Tag")
+            self.textbox_list[-1].textChanged.connect(lambda text, checkbox=self.checkbox_list[-1]: checkbox.setText(text))
+
+            checkbox_layout_list.append(QHBoxLayout())
+            checkbox_layout_list[-1].addWidget(self.checkbox_list[-1])
+            checkbox_layout_list[-1].addWidget(self.textbox_list[-1])
+            self.checkbox_layout.addLayout(checkbox_layout_list[-1])
 
         self.main_layout = QVBoxLayout(self)
         self.main_layout.addLayout(self.checkbox_layout)
-
         self.main_layout.setAlignment(Qt.AlignLeft)
         self.setMinimumSize(204, 640)
         self.setMaximumSize(204, 640)
-
 
 class Pannel_Data_DragnDrop(QWidget):
 
@@ -164,15 +170,20 @@ class Pannel_Data_DragnDrop(QWidget):
             event.accept()
 
             for url in event.mimeData().urls():
-                file_path = str(url.toLocalFile())
+                self.parent.parent.parent.file_loaded_to_gui = str(url.toLocalFile())
+                self.local_filename=self.parent.parent.parent.file_loaded_to_gui
+                print(self.parent.parent.parent.file_loaded_to_gui)
+                print("File is saved in memory")
 
                 # read the contents of the file and set the text of the parent's right_pane QLabel widget
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(self.local_filename, 'r', encoding='utf-8') as f:
                     text = f.read()
-                    self.parent.parent.right_pane.text_label.setText(text)
+                    self.parent.parent.parent.data_loaded_to_gui = text
+                    #self.parent.parent.right_pane.text_label.setText(text)
+
 
                 # update the filename in the parent's left_pane QLabel widget
-                filename = file_path.split('/')[-1]
+                filename = self.local_filename.split('/')[-1]
                 #self.parent.left_pane.label.setText(filename)
         else:
             event.ignore()
@@ -275,6 +286,7 @@ class Pannel1_Right(QWidget):
 class Panel1(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
+        self.parent = parent
 
         self.left_pane = Pannel1_Left(self)
         self.right_pane = Pannel1_Right(self)
@@ -294,28 +306,75 @@ class Panel1(QWidget):
         self.setLayout(vbox)
 
 
+class FPS(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+
+
+
+
+
+
+        # create plot widget
+        self.plot = pg.PlotWidget()
+        self.plot.setLabel('left', 'Y Axis Label')
+        self.plot.setLabel('bottom', 'X Axis Label')
+
+        # create button to plot data
+        self.plot_button = QPushButton('Plot Data')
+        self.plot_button.clicked.connect(self.plot_data)
+
+        # add plot widget and button to layout
+        layout = QHBoxLayout()
+        layout.addWidget(self.plot)
+        layout.addWidget(self.plot_button)
+
+        self.setLayout(layout)
+
+    def plot_data(self):
+        # clear existing plot data
+        self.plot.clear()
+        file_data = self.parent.parent.log_read_object
+        print(self.parent.parent.file_loaded_to_gui)
+        file_data.read_file_execute(self.parent.parent.file_loaded_to_gui)
+        file_data.read_file_execute_fps()
+        self.x_data = file_data.timestamp_list
+
+        self.y_data = file_data.fps_list
+
+
+
+        # add data to plot
+        self.plot.plot(self.x_data, self.y_data)
+
+        # set fixed limits on x and y axes
+        print(self.x_data[0])
+        print(self.x_data[-1])
+        self.plot.setLimits(xMin=self.x_data[0], xMax=self.x_data[-1], yMin=0, yMax=100)
+
+
+
+        #self.plot.setMouseEnabled(x=False, y=False)
+
+        # set plot to display as an image (no scrollbars)
 
 
 class Panel2(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
+        self.parent = parent
 
-        panels = []
-        for i in range(6):
-            panel = QWidget()
-            panel.setStyleSheet(f"background-color: rgb({i * 20}, {255 - i * 20}, {i * 40})")
-            layout = QVBoxLayout()
-            layout.addWidget(QLabel(f"Panel {i + 1}"))
-            panel.setLayout(layout)
-            panels.append(panel)
+        self.fps_widget = FPS(self)
+
+
 
         vbox = QVBoxLayout()
-        for i in range(2):
-            hbox = QHBoxLayout()
-            hbox.addWidget(panels[i * 3])
-            hbox.addWidget(panels[i * 3 + 1])
-            hbox.addWidget(panels[i * 3 + 2])
-            vbox.addLayout(hbox)
+
+        hbox = QHBoxLayout()
+
+        hbox.addWidget(self.fps_widget)
+        vbox.addLayout(hbox)
 
         self.setLayout(vbox)
 
@@ -349,6 +408,8 @@ class Panel3(QWidget):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.file_loaded_to_gui=""
+        self.log_read_object=lr.ReadFile()
 
         self.setWindowTitle("Multi-Screen GUI")
 

@@ -26,6 +26,7 @@ class Scan_n_Edit(QLabel):
 
 
 
+
         button_layout.setContentsMargins(0, 0, 0, 0)
         button_layout.setSpacing(0)
 
@@ -41,7 +42,6 @@ class Scan_n_Edit(QLabel):
 
         # Set the layout of the widget to the button layout
         self.setLayout(button_layout)
-
 
 
 
@@ -72,30 +72,19 @@ class Filter_tag(QWidget):
         self.setStyleSheet("border: none;")
         self.parent = parent
         self.checkbox_layout = QVBoxLayout()
-        self.checkbox_layout.addWidget(QCheckBox("FPS", self))
+
+        first_checkbox=QCheckBox("FPS", self)
+        self.checkbox_layout.addWidget(first_checkbox)
         self.checkbox_layout.addWidget(QCheckBox("Battery Level", self))
         self.checkbox_layout.addWidget(QCheckBox("Frame Repeat", self))
         self.checkbox_layout.addWidget(QCheckBox("Bit Rate", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
 
-        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
-        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
-        self.checkbox_layout.addWidget(QCheckBox("Wifi Speed", self))
+
+
+
+        #add a action whe the button is selcted in checkbox
+
+
 
         # create button and add it to new layout
 
@@ -287,9 +276,14 @@ class Panel1(QWidget):
 
 
 
+
+
+
 class Panel2(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
+
+
 
         panels = []
         for i in range(6):
@@ -303,9 +297,11 @@ class Panel2(QWidget):
         vbox = QVBoxLayout()
         for i in range(2):
             hbox = QHBoxLayout()
+
             hbox.addWidget(panels[i*3])
             hbox.addWidget(panels[i*3+1])
             hbox.addWidget(panels[i*3+2])
+
             vbox.addLayout(hbox)
 
         self.setLayout(vbox)
