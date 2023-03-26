@@ -33,6 +33,7 @@ class Scan_n_Edit(QLabel):
         button_layout.addWidget(edit_button)
         button_layout.addWidget(scan_button)
 
+        button_layout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
 
 
 
@@ -55,8 +56,8 @@ class Filter_Block(QLabel):
         self.setLayout(vbox)
 
 
-        self.setMinimumSize(204, 400)
-        self.setMaximumSize(204, 400)
+        self.setMinimumSize(204,640)
+        self.setMaximumSize(204,640)
         vbox.setAlignment(Qt.AlignTop | Qt.AlignLeft)
 
         #controll the expanding or fixed scaling behiour of the cchild widget
@@ -71,7 +72,10 @@ class Filter_tag(QWidget):
         self.setStyleSheet("border: none;")
         self.parent = parent
         self.checkbox_layout = QVBoxLayout()
-        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
+        self.checkbox_layout.addWidget(QCheckBox("FPS", self))
+        self.checkbox_layout.addWidget(QCheckBox("Battery Level", self))
+        self.checkbox_layout.addWidget(QCheckBox("Frame Repeat", self))
+        self.checkbox_layout.addWidget(QCheckBox("Bit Rate", self))
         self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
         self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
         self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
@@ -80,6 +84,18 @@ class Filter_tag(QWidget):
         self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
         self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
         self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 3", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
+
+        self.checkbox_layout.addWidget(QCheckBox("Option 1", self))
+        self.checkbox_layout.addWidget(QCheckBox("Option 2", self))
+        self.checkbox_layout.addWidget(QCheckBox("Wifi Speed", self))
 
         # create button and add it to new layout
 
@@ -87,9 +103,14 @@ class Filter_tag(QWidget):
         self.main_layout = QVBoxLayout(self)
         self.main_layout.addLayout(self.checkbox_layout)
 
+
         vbox = QVBoxLayout(self)
         vbox.addLayout(self.checkbox_layout)
         vbox.setAlignment(Qt.AlignLeft)
+
+
+
+
         self.setLayout(vbox)
 
 
@@ -134,11 +155,8 @@ class Pannel_Data_DragnDrop(QWidget):
         vbox.setContentsMargins(0, 0, 0, 0)
         vbox.setSpacing(0)
         vbox.addWidget(self.text_label)
-        self.setLayout(vbox)
-
         vbox.setAlignment(Qt.AlignTop | Qt.AlignLeft)
-
-
+        self.setLayout(vbox)
 
 
 
@@ -170,11 +188,11 @@ class Pannel_Data_DragnDrop(QWidget):
                 # read the contents of the file and set the text of the parent's right_pane QLabel widget
                 with open(file_path, 'r', encoding='utf-8') as f:
                     text = f.read()
-                    self.parent.right_pane.text_label.setText(text)
+                    self.parent.parent.right_pane.text_label.setText(text)
 
                 # update the filename in the parent's left_pane QLabel widget
                 filename = file_path.split('/')[-1]
-                self.parent.left_pane.label.setText(filename)
+                #self.parent.left_pane.label.setText(filename)
         else:
             event.ignore()
 
@@ -198,31 +216,11 @@ class Pannel1_Left(QWidget):
         vbox = QVBoxLayout(self)
 
         vbox.addWidget(self.dragndrop)
-        self.dragndrop.setContentsMargins(0, 0, 0, 0)
-        self.dragndrop.layout().setSpacing(0)
-
         vbox.addWidget(self.filter_block)
-        self.filter_block.setContentsMargins(0, 0, 0, 0)
-        self.filter_block.layout().setSpacing(0)
-
         vbox.addWidget(self.scan_edit)
-        self.scan_edit.setContentsMargins(0, 0, 0, 0)
-        self.scan_edit.layout().setSpacing(0)
 
         vbox.setContentsMargins(0, 0, 0, 0)
-        vbox.setSpacing(0)
-        vbox.setAlignment(Qt.AlignTop)
-
-        self.setMinimumSize(204, 900)
-        self.setMinimumSize(204, 900)
-
-
-
-
-
-
-
-
+        vbox.setSpacing(11)
 
 
 
@@ -279,6 +277,10 @@ class Panel1(QWidget):
         hbox.addWidget(self.right_pane)
 
         vbox = QVBoxLayout()
+
+        vbox.setContentsMargins(10, 0, 0, 0)
+        vbox.setSpacing(20)
+
         vbox.addLayout(hbox)
 
         self.setLayout(vbox)
