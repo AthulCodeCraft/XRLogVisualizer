@@ -47,18 +47,34 @@ class Scan_n_Edit(QLabel):
         #clear the teext_label in the right pane
         self.parent.parent.right_pane.text_label.setText("")
         tag_list=[]
+        tag_colour_list_box=[]
         # to check the satus of the check box in the filter block
+        self.colour_list=["red","blue","green","yellow","orange","pink","purple","brown","grey","black","white","cyan","magenta","lime"]
+
         for checkbox in self.parent.filter_block.filter_element.checkbox_list:
             if checkbox.isChecked():
                 tag_list.append(checkbox.text())
 
 
-        print(tag_list)
         self.parent.parent.parent.log_read_object.read_file_execute(self.parent.parent.parent.file_loaded_to_gui)
         self.parent.parent.parent.log_read_object.read_logs_with_tags(tag_list)
         filtered_logs=self.parent.parent.parent.log_read_object.return_filtered_logs()
-        
-        text_to_display = '\n'.join(filtered_logs)
+        filter_log_colured=[]
+        tag_colour_list=self.parent.filter_block.filter_element.tag_colour_list_box
+
+        for line in filtered_logs:
+            # create a for i loop for tag in tag_list
+            for i in range(len(tag_list)):
+                tag=tag_list[i]
+
+                if tag in line:
+                    colured_line=f"<font color={self.colour_list[i]}>{line}</font><br>"
+
+
+            filter_log_colured.append(colured_line)
+
+        text_to_display = '\n'.join(filter_log_colured)
+
         self.parent.parent.right_pane.text_label.setText(text_to_display)
 
 
@@ -99,12 +115,27 @@ class Filter_tag(QWidget):
         self.checkbox_list=[]
         self.textbox_list=[]
         checkbox_layout_list=[]
+        #create a dictionary with key as the tag and value as the colour
+        self.tag_colour_list_box={}
+
 
         for checkbox in range (0,14):
             self.checkbox_list.append(QCheckBox(self))
             self.textbox_list.append(QLineEdit(self))
             self.textbox_list[-1].setText("Tag")
             self.textbox_list[-1].textChanged.connect(lambda text, checkbox=self.checkbox_list[-1]: checkbox.setText(text))
+
+
+            #assign a colour to every tags in the tag colour list box
+
+
+
+
+
+
+
+
+
 
             checkbox_layout_list.append(QHBoxLayout())
             checkbox_layout_list[-1].addWidget(self.checkbox_list[-1])
