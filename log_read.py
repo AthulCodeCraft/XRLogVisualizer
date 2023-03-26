@@ -17,7 +17,7 @@ class ReadFile():
         self.payload_list = []
         self.timestamp_list = []
         self.fps_list = []
-        self.filter_log=None
+        self.filter_log=[]
 
 
         self.pattern = r'(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})\.(\d{3})\s+(\d+)\s+(\d+)\s+([A-Z]+)\s+(.+)'
@@ -88,10 +88,10 @@ class ReadFile():
                     self.fps_list.append(fps)
 
 
-        print(self.fps_list)
-        print(self.timestamp_list)
+
 
     def read_logs_with_tags(self,tag_list):
+        self.filter_log=[]
 
         for line in self.file_data:
             for tag in tag_list:

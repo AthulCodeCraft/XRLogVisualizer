@@ -17,13 +17,12 @@ class Scan_n_Edit(QLabel):
         button_layout = QHBoxLayout()
 
         scan_button = QPushButton("Scan File", self)
-        edit_button = QPushButton("Edit", self)
 
-        scan_button.setMinimumSize(165, 40)
 
-        scan_button.setMaximumSize(165, 40)
-        edit_button.setMinimumSize(40, 40)
-        edit_button.setMaximumSize(40, 40)
+        scan_button.setMinimumSize(204, 40)
+
+        scan_button.setMaximumSize(204, 40)
+
 
         button_layout.setContentsMargins(0, 0, 0, 0)
         button_layout.setSpacing(0)
@@ -33,7 +32,7 @@ class Scan_n_Edit(QLabel):
         print("Scan done")
 
 
-        button_layout.addWidget(edit_button)
+
         button_layout.addWidget(scan_button)
 
         button_layout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
@@ -45,6 +44,8 @@ class Scan_n_Edit(QLabel):
 
     def run_scan_function(self):
         print("Scan function action")
+        #clear the teext_label in the right pane
+        self.parent.parent.right_pane.text_label.setText("")
         tag_list=[]
         # to check the satus of the check box in the filter block
         for checkbox in self.parent.filter_block.filter_element.checkbox_list:
@@ -53,6 +54,12 @@ class Scan_n_Edit(QLabel):
 
 
         print(tag_list)
+        self.parent.parent.parent.log_read_object.read_file_execute(self.parent.parent.parent.file_loaded_to_gui)
+        self.parent.parent.parent.log_read_object.read_logs_with_tags(tag_list)
+        filtered_logs=self.parent.parent.parent.log_read_object.return_filtered_logs()
+        
+        text_to_display = '\n'.join(filtered_logs)
+        self.parent.parent.right_pane.text_label.setText(text_to_display)
 
 
 
@@ -107,8 +114,8 @@ class Filter_tag(QWidget):
         self.main_layout = QVBoxLayout(self)
         self.main_layout.addLayout(self.checkbox_layout)
         self.main_layout.setAlignment(Qt.AlignLeft)
-        self.setMinimumSize(204, 640)
-        self.setMaximumSize(204, 640)
+        self.setMinimumSize(180, 620)
+        self.setMaximumSize(180, 620)
 
 class Pannel_Data_DragnDrop(QWidget):
 
@@ -221,7 +228,7 @@ class Pannel1_Right(QWidget):
         self.parent = parent
 
         self.text_label = QLabel()
-        self.text_label.setStyleSheet("background-color: lightgreen")
+        self.text_label.setStyleSheet("background-color: lightblue")
 
         # create a scroll area and set the text label as its widget
 
