@@ -1,8 +1,27 @@
+import sys
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QPixmap
+import pyqtgraph as pg
+from PyQt5.QtGui import QDrag
+from PyQt5.QtCore import QMimeData
+from PyQt5.QtGui import QDrag
+from PyQt5.QtWidgets import QLabel, QApplication
 import re
 
-class ReadFile():
+import re
+import numpy as np
+from datetime import datetime
 
-    def __init__(self):
+pattern = re.compile(r'^(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.(\d{3}) (\d+) (\d+) (\S+) (.*)$')
+
+class ReadFile(QWidget):
+
+    def __init__(self,parent):
+        super().__init__(parent)
+        self.parent = parent
         self.file_path = 'r.txt'
 
         self.day_list = []
@@ -50,16 +69,26 @@ class ReadFile():
         self.fps_list = []
         self.battery_level_list=[]
 
+    # compile regular expression pattern
+    pattern = re.compile(r'^(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.(\d{3}) (\d+) (\d+) (\S+) (.*)$')
 
     def read_file_execute_fps(self):
         previous_timestamp = 0
         offset = 0
         self.set_variables_zero()
 
+        # Get total number of lines
+        total_lines = len(self.file_data)
+        current_line = 0
+
+        self.parent.progress_bar_read.setStyleSheet("QProgressBar::chunk {background-color: #6767ff;}")
+
 
         for line in self.file_data:
 
-            if"FPS" in line:
+            current_line += 1
+
+            if "FPS" in line:
                 # Extract relevant information from log line
                 match = re.match(self.pattern, line)
                 if match:
@@ -74,9 +103,8 @@ class ReadFile():
                     sub_id = int(match.group(8))
                     tag = match.group(9)
                     payload = match.group(10)
-                    fps_match=re.match(r"FPS=(\d+)",payload)
-                    fps=float(fps_match.group(1))
-
+                    fps_match = re.match(r"FPS=(\d+)", payload)
+                    fps = float(fps_match.group(1))
 
                     # Calculate timestamp
                     timestamp = millisecond + second * 1000 + minute * 60 * 1000 + hour * 60 * 60 * 1000 + offset
@@ -88,6 +116,12 @@ class ReadFile():
 
                     # Update previous timestamp to current value
                     previous_timestamp = timestamp
+
+                    # Update progress bar
+
+                    progress_value = int(current_line / total_lines * 100)
+                    print(progress_value)
+                    self.parent.progress_bar_read.setValue(progress_value)
 
                     # Do whatever processing you need with the extracted information here
                     # print(f"Date: {day}-{month}, Timestamp: {timestamp}, Process ID: {process_id}, Sub ID: {sub_id}, Tag: {tag}, Payload: {payload}")
@@ -106,16 +140,31 @@ class ReadFile():
                     self.fps_list.append(fps)
                     self.timestamp_list.append(timestamp)
 
-
+        self.parent.progress_bar_read.setValue(100)
+        self.parent.progress_bar_read.setStyleSheet("QProgressBar::chunk {background-color: ##67ff67;}")
 
 
     def read_logs_with_tags(self,tag_list):
-        self.filter_log=[]
-
+        self.filter_log = []
         for line in self.file_data:
+            matched_tags = []
             for tag in tag_list:
                 if tag in line:
-                    self.filter_log.append(line)
+                    matched_tags.append(tag)
+
+            if len(matched_tags) > 1:
+                # There are multiple matched tags, find the one with more words
+                max_length = 0
+                max_tag = None
+                for tag in matched_tags:
+                    length = len(tag.split())
+                    if length > max_length:
+                        max_length = length
+                        max_tag = tag
+                self.filter_log.append(line.replace(max_tag, f"{max_tag}"))
+            elif len(matched_tags) == 1:
+                # Only one matched tag
+                self.filter_log.append(line)
 
     def return_filtered_logs(self):
         return self.filter_log
