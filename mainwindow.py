@@ -1,11 +1,20 @@
 import sys
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import *
-from PySide2.QtGui import QIcon
-from PySide2.QtCore import QSize
-from PySide2.QtGui import QPixmap
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QPixmap
 import pyqtgraph as pg
 import log_read as lr
+import hbar as hb
+from PyQt5.QtGui import QDrag
+from PyQt5.QtCore import QMimeData
+from PyQt5.QtGui import QDrag
+from PyQt5.QtWidgets import QLabel, QApplication
+
+
+
+
 
 class Scan_n_Edit(QLabel):
     def __init__(self, parent):
@@ -127,64 +136,6 @@ class Filter_tag(QWidget):
         self.setMinimumSize(180, 620)
         self.setMaximumSize(180, 620)
 
-class Pannel_Data_DragnDrop(QWidget):
-
-    def __init__(self, parent):
-        super().__init__(parent)
-
-        self.parent = parent
-        self.setStyleSheet("border: 2px solid black")
-        self.text_label = QLabel()
-        # create a QPixmap object with the image file
-        pixmap = QPixmap(r'C:\Users\athul\PycharmProjects\Log_Analyser\thumbnail\img.png')
-        # set the background image for the QLabel
-        self.text_label.setPixmap(pixmap)
-        # set the alignment of the label to center
-        self.text_label.setAlignment(Qt.AlignLeft)
-        # create a vertical box layout and add the label to it
-        vbox = QVBoxLayout()
-        # set the alignment of the vbox to the top
-        vbox.setAlignment(Qt.AlignLeft)
-        # set the widget's minimum size to the size of the pixmap
-        self.setMinimumSize(pixmap.size())
-        self.setAcceptDrops(True)
-        vbox = QVBoxLayout()
-        vbox.setContentsMargins(0, 0, 0, 0)
-        vbox.setSpacing(0)
-        vbox.addWidget(self.text_label)
-        vbox.setAlignment(Qt.AlignTop | Qt.AlignLeft)
-        self.setLayout(vbox)
-
-    def dragEnterEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.accept()
-        else:
-            event.ignore()
-
-    def dragMoveEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.setDropAction(Qt.CopyAction)
-            event.accept()
-        else:
-            event.ignore()
-
-    def dropEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.setDropAction(Qt.CopyAction)
-            event.accept()
-
-            for url in event.mimeData().urls():
-                self.parent.parent.parent.file_loaded_to_gui = str(url.toLocalFile())
-                self.local_filename=self.parent.parent.parent.file_loaded_to_gui
-                print(self.parent.parent.parent.file_loaded_to_gui)
-
-                with open(self.local_filename, 'r', encoding='utf-8') as f:
-                    text = f.read()
-                    self.parent.parent.parent.data_loaded_to_gui = text
-                    #self.parent.parent.right_pane.text_label.setText(text)
-
-        else:
-            event.ignore()
 
 
 class Pannel1_Left(QWidget):
@@ -193,11 +144,11 @@ class Pannel1_Left(QWidget):
         super().__init__(parent)
 
         self.parent = parent
-        self.dragndrop = Pannel_Data_DragnDrop(self)
+
         self.filter_block = Filter_Block(self)
         self.scan_edit = Scan_n_Edit(self)
         vbox = QVBoxLayout(self)
-        vbox.addWidget(self.dragndrop)
+
         vbox.addWidget(self.filter_block)
         vbox.addWidget(self.scan_edit)
         vbox.setContentsMargins(20, 0, 0, 0)
@@ -383,6 +334,57 @@ class Panel3(QWidget):
         hbox.addWidget(self.battery_level)
         vbox.addLayout(hbox)
         self.setLayout(vbox)
+class Tab3Panels(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+
+        tab_widget3 = QTabWidget()
+        tab_widget3.setTabPosition(QTabWidget.North)
+
+
+        tab_widget3.addTab(Panel2(self), "Headpose")
+        tab_widget3.addTab(Panel3(self), "Tracking Camera FPS")
+        tab_widget3.addTab(Panel3(self), "RGB Camera FPS")
+
+
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(tab_widget3)
+        self.setLayout(main_layout)
+class Tab1Panels(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+
+        tab_widget1 = QTabWidget()
+        tab_widget1.setTabPosition(QTabWidget.North)
+
+
+        tab_widget1.addTab(Panel2(self), "FPS")
+        tab_widget1.addTab(Panel2(self), "Battery")
+        tab_widget1.addTab(Panel3(self), "ISO Gain")
+
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(tab_widget1)
+        self.setLayout(main_layout)
+class Tab2Panels(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+
+        tab_widget2 = QTabWidget()
+        tab_widget2.setTabPosition(QTabWidget.North)
+
+
+        tab_widget2.addTab(Panel1(self), "Validate Data")
+
+
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(tab_widget2)
+        self.setLayout(main_layout)
+
+
+
 
 
 class MainWindow(QMainWindow):
@@ -396,39 +398,130 @@ class MainWindow(QMainWindow):
         open_action = QAction("Open", self)
         open_action.triggered.connect(self.open_file)
         file_menu.addAction(open_action)
-        tab_widget = QTabWidget()
 
-        self.setCentralWidget(tab_widget)
-        self.panel1 = Panel1(self)
-        tab_widget.addTab(self.panel1, "Data")
+        self.setAcceptDrops(True)
 
+
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout()
+        central_widget.setLayout(main_layout)
+
+        tab_widget=hb.TabWidget()
+        tab_widget.setTabPosition(QTabWidget.West)
+
+        #change tab button width to 300
+
+
+
+        print("abcd")
+
+
+
+        tab_widget.addTab(Tab2Panels(self),"Data")
+        tab_widget.addTab(Tab1Panels(self),"Mulitmedia")
+        tab_widget.addTab(Tab3Panels(self),"QVR")
+
+        tab_widget.tabBar().setStyleSheet("QTabBar::tab { width: 200px; }")
+
+        #self.dragndrop = Pannel_Data_DragnDrop(self)
+
+        #main_layout.addWidget(self.dragndrop)
+
+        main_layout.addWidget(tab_widget)
+
+
+        # Set the maximum size of the panels
         desktop = QApplication.desktop()
         desktop_rect = desktop.geometry()
         desktop_width = desktop_rect.width()
         desktop_height = desktop_rect.height()
 
-        self.panel2 = Panel2(self)
-        tab_widget.addTab(self.panel2, "Render FPS")
+        self.setAcceptDrops(True)
 
-        self.panel3 = Panel3(self)
-        tab_widget.addTab(self.panel3, "Battery Level")
+        # Create the overlay label
+        self.overlay_label2 = QLabel(central_widget)
+        pixmap = QPixmap(r"C:\Users\athul\PycharmProjects\Log_Analyser\thumbnail\dd.bmp")
+        # set the QPixmap instance as the label's image
+        self.overlay_label2.setPixmap(pixmap)
 
-        self.panel1.setMaximumSize(desktop_width - 50, desktop_height - 150)
-        self.panel2.setMaximumSize(desktop_width - 50, desktop_height - 150)
-        self.panel3.setMaximumSize(desktop_width - 50, desktop_height - 150)
+        self.overlay_label2.setScaledContents(True)
+        self.overlay_label2.setAlignment(Qt.AlignCenter)
+        self.overlay_label2.setStyleSheet("QLabel { background-color: rgba(255, 255, 255, 128); }")
+        self.overlay_label2.setGeometry(0, 0, desktop_width, desktop_height)
+
+        opacity_effect = QGraphicsOpacityEffect()
+        opacity_effect.setOpacity(0.5)
+        self.overlay_label2.setGraphicsEffect(opacity_effect)
+
+        # self.overlay_label.raise_()
+
+        self.overlay_label = QLabel(central_widget)
+        pixmap2 = QPixmap(r"C:\Users\athul\PycharmProjects\Log_Analyser\thumbnail\drop.bmp")
+        self.overlay_label.setPixmap(pixmap2)
+
+
+        self.overlay_label.setScaledContents(True)
+        self.overlay_label.setAlignment(Qt.AlignCenter)
+        self.overlay_label.setStyleSheet("QLabel { background-color: rgba(255, 255, 255, 128); }")
+        self.overlay_label.setGeometry(0, 0, desktop_width, desktop_height)
+
+        opacity_effect = QGraphicsOpacityEffect()
+        opacity_effect.setOpacity(0.5)
+        self.overlay_label.setGraphicsEffect(opacity_effect)
+        self.overlay_label.hide()
+        #self.overlay_label.raise_()
+
+    def dragEnterEvent(self, event):
+
+        self.overlay_label2.hide()
+        self.overlay_label.show()
+
+        if event.mimeData().hasUrls():
+            event.accept()
+        else:
+            event.ignore()
+
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.setDropAction(Qt.CopyAction)
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        self.overlay_label2.hide()
+
+        self.overlay_label.hide()
+        if event.mimeData().hasUrls():
+            event.setDropAction(Qt.CopyAction)
+            event.accept()
+
+            for url in event.mimeData().urls():
+                self.file_loaded_to_gui = str(url.toLocalFile())
+                self.local_filename=self.file_loaded_to_gui
+                print(self.file_loaded_to_gui)
+
+                with open(self.local_filename, 'r', encoding='utf-8') as f:
+                    text = f.read()
+                    self.data_loaded_to_gui = text
+                    #self.parent.parent.right_pane.text_label.setText(text)
+
+        else:
+            event.ignore()
+
 
     def open_file(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Text Files (*.txt);;All Files (*)")
         self.file_loaded_to_gui=file_path
 
         if file_path:
+            self.overlay_label2.hide()
 
             with open(file_path, 'r', encoding='utf-8') as f:
                 text = f.read()
                 self.data_loaded_to_gui = text
                 #self.parent.parent.right_pane.text_label.setText(text)
-
-
 
 
 if __name__ == '__main__':
