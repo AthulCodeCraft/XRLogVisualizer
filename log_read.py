@@ -89,6 +89,7 @@ class ReadFile(QWidget):
             current_line += 1
 
             if "FPS" in line:
+
                 # Extract relevant information from log line
                 match = re.match(self.pattern, line)
                 if match:
@@ -120,7 +121,7 @@ class ReadFile(QWidget):
                     # Update progress bar
 
                     progress_value = int(current_line / total_lines * 100)
-                    print(progress_value)
+                    print(current_line)
                     self.parent.progress_bar_read.setValue(progress_value)
 
                     # Do whatever processing you need with the extracted information here

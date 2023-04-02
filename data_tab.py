@@ -10,7 +10,7 @@ from PyQt5.QtGui import QDrag
 from PyQt5.QtCore import QMimeData
 from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QLabel, QApplication
-
+import time
 
 
 class Scan_n_Edit(QLabel):
@@ -49,6 +49,9 @@ class Scan_n_Edit(QLabel):
         button_layout.addWidget(scan_button)
         button_layout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
         self.setLayout(button_layout)
+        self.setMinimumWidth(220)
+        self.setMaximumWidth(220)
+
 
     def toggle_display(self, checked):
         self.toggle_flag = checked
@@ -77,17 +80,35 @@ class Scan_n_Edit(QLabel):
             for line in filtered_logs:
                 # create a for i loop for tag in tag_list
                 for i in range(len(tag_list)):
+
+
                     tag=tag_list[i]
 
                     if tag in line:
                         colured_line=f"<font color={self.colour_list[i]}>{line}</font><br>"
                 filter_log_colured.append(colured_line)
+
+
             text_to_display = '\n'.join(filter_log_colured)
             self.parent.parent.right_panel.text_label.setText(text_to_display)
         else:
-            text_to_display = '\n'.join(filtered_logs)
-            self.parent.parent.right_panel.text_label.setText(text_to_display)
+            #add time record start time here
+            start_time = time.time()
 
+            text_to_display = '\n'.join(filtered_logs)
+            #i only need to display a chunk of filters logs a point of time and if i scroll i need the next chunk of logs to be displayed
+            #so i need to create a function that will display the logs in chunks
+
+            print(len(text_to_display))
+            #split the text to display into 10000 line each
+
+
+
+
+
+            self.parent.parent.right_panel.text_label.setText(text_to_display)
+            stop_time = time.time()
+            print("Time taken to display the logs is ", stop_time - start_time)
 class Filter_block(QLabel):
     def __init__(self, parent):
         super().__init__(parent)
@@ -148,9 +169,16 @@ class Data_panel_left(QWidget):
 
         vbox.addWidget(self.filter_block)
         vbox.addWidget(self.scan_edit)
-        vbox.setContentsMargins(20, 0, 0, 0)
+        vbox.setContentsMargins(0, 0, 0, 0)
         vbox.setSpacing(11)
         self.setLayout(vbox)
+        self.setMinimumWidth(230)
+        self.setMaximumWidth(230)
+        #allgin the left panel to the left
+        vbox.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+
+
+
 class Data_panel_right(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
@@ -159,61 +187,27 @@ class Data_panel_right(QWidget):
         self.setStyleSheet("background-color: white;")
         # create a QTextEdit widget and set its stylesheet
         self.text_label = QTextBrowser()
-        self.text_label.setStyleSheet("background-color: lightblue;")
+        self.text_label.setStyleSheet("background-color: #cee7ff;")
         # create a scroll area and set the text label as its widget
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setWidget(self.text_label)
+
         # create a custom scrollbar stylesheet
 
-        scrollbar_stylesheet = """
-        QScrollBar:vertical {
-            background: transparent;
-            width: 12px;
-            margin: 0px;
-        }
-        QScrollBar::handle:vertical {
-            background-color: #BDBDBD;
-            border-radius: 6px;
-            min-height: 20px;
-        }
-        QScrollBar::handle:hover {
-            background-color: #9E9E9E;
-        }
-        QScrollBar::add-line:vertical {
-            height: 0px;
-            subcontrol-position: bottom;
-            subcontrol-origin: margin;
-        }
-        QScrollBar::sub-line:vertical {
-            height: 0px;
-            subcontrol-position: top;
-            subcontrol-origin: margin;
-        }
-        QScrollBar::add-page:vertical,QScrollBar::sub-page:vertical {
-            background-color: transparent;
-        }
-        QScrollBar::add-page:vertical {
-            margin: 0px;
-        }
-        QScrollBar::sub-page:vertical {
-            margin: 0px;
-        }
-        """
 
-        # set the custom stylesheet to the scrollbar
-        self.scroll_area.verticalScrollBar().setStyleSheet(scrollbar_stylesheet)
 
         # create a layout for the widget
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
-        hbox.setSpacing(0)
-        hbox.addWidget(self.scroll_area)
-        self.setMinimumWidth(1600)
-        self.setMaximumWidth(1600)
-        self.setLayout(hbox)
+        hbox.setSpacing(1)
+        self.setMinimumWidth(1400)
+        self.setMaximumWidth(1400)
         hbox.setAlignment(Qt.AlignTop | Qt.AlignLeft)
-
+        hbox.addWidget(self.text_label)
+        #add scroll bars
+        self.scrollbar = QScrollBar(self)
+        self.scrollbar.setOrientation(Qt.Vertical)
+        self.scrollbar2 = QScrollBar(self)
+        self.scrollbar2.setOrientation(Qt.Horizontal)
+        self.setLayout(hbox)
 
 class Data_panel(QWidget):
     def __init__(self, parent):
@@ -222,13 +216,15 @@ class Data_panel(QWidget):
         self.left_panel = Data_panel_left(self)
         self.right_panel = Data_panel_right(self)
         hbox = QHBoxLayout()
-        hbox.addWidget(self.left_panel, 1)  # horizontal stretch factor of 1/3
-        hbox.addWidget(self.right_panel, 2)  # horizontal stretch factor of 2/3
+        hbox.addWidget(self.left_panel)  # horizontal stretch factor of 1/3
+        hbox.addWidget(self.right_panel)  # horizontal stretch factor of 2/3
         vbox = QVBoxLayout()
         vbox.addLayout(hbox)
         vbox.setContentsMargins(0, 0, 0, 0)
         vbox.setSpacing(0)
         self.setLayout(vbox)
+        #allign
+        vbox.setAlignment(Qt.AlignTop | Qt.AlignLeft)
 
 
 class Data_tab(QWidget):
@@ -238,12 +234,16 @@ class Data_tab(QWidget):
 
         data_tab_widget = QTabWidget()
         data_tab_widget.setTabPosition(QTabWidget.North)
+        self.setStyleSheet("QTabBar::tab { height: 30px; }")
 
 
-        data_tab_widget.addTab(Data_panel(self), "Log Filter")
+        data_tab_widget.addTab(Data_panel(self), " Log Filter")
 
 
         main_layout = QVBoxLayout()
         main_layout.addWidget(data_tab_widget)
         self.setLayout(main_layout)
+        #allgin
+        main_layout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+
 

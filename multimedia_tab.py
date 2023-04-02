@@ -170,6 +170,7 @@ class Multimedia_tab(QWidget):
         self.parent = parent
 
         multimedia_tab_widget = QTabWidget()
+        self.setStyleSheet("QTabBar::tab { height: 30px; }")
         multimedia_tab_widget.setTabPosition(QTabWidget.North)
 
         ####################################Add the panels here###################################################

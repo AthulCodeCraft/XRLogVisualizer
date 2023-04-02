@@ -19,13 +19,30 @@ class HorizontalTabBar(QtWidgets.QTabBar):
             size.transpose()
         return size
 
+    #function to add tabicons on the tabs
+
+
+
 
 class TabWidget(QtWidgets.QTabWidget):
     def __init__(self, parent=None):
         QtWidgets.QTabWidget.__init__(self, parent)
         self.setTabBar(HorizontalTabBar())
 
+
+
+
         #set the tab style sheet
+        #add style sheet not to children
+        #set colur and height
+        #add tab icon to the tab
+
+
+        #self.setStyleSheet("QTabBar::tab:selected { background: #cee7ff; } QTabBar::tab { height: 70px; }")
+
+        #self.setStyleSheet("QTabBar::tab { height: 100px; }, QTabBar::tab:selected { background: #cee7ff  ; }")
+        #chnage colur when selected
+
 
 
         #print the height of the tab

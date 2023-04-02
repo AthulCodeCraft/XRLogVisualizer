@@ -170,6 +170,7 @@ class PVR_tab(QWidget):
         self.parent = parent
 
         pvr_tab_widget = QTabWidget()
+        self.setStyleSheet("QTabBar::tab { height: 30px; }")
         pvr_tab_widget.setTabPosition(QTabWidget.North)
 
         ####################################Add the panels here###################################################
