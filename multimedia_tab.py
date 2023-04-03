@@ -5,19 +5,34 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 import pyqtgraph as pg
+#import QBrush
+from PyQt5.QtGui import QBrush
+
+#import QFont
+from PyQt5.QtGui import QFont
 from PyQt5.QtGui import QDrag
 from PyQt5.QtCore import QMimeData
 from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QLabel, QApplication
-
 class FPS(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
         # create plot widget
         self.plot = pg.PlotWidget()
+        self.plot.setBackground('w')  # set background color to white
         self.plot.setLabel('left', 'Y Axis Label')
         self.plot.setLabel('bottom', 'X Axis Label')
+        # set font for axis labels
+        font = QFont('Calibri', 11, QFont.Bold)
+        self.plot.getAxis('bottom').setTickFont(font)
+        self.plot.getAxis('left').setTickFont(font)
+
+        self.plot.getAxis('bottom').setLabel(text='Timestamp', font=font, color='k')
+        self.plot.getAxis('left').setLabel(text='FPS', font=font, color='k')
+        # set line color and marker color for plotted data
+        self.pen = pg.mkPen(color=(0, 112, 192), width=5)  # red line with width of 2
+        self.brush = pg.mkBrush(color=(0, 112, 192))  # blue marker
         # create button to plot data
         self.plot_button = QPushButton('Plot Data')
         self.plot_button.clicked.connect(self.plot_data)
@@ -26,6 +41,8 @@ class FPS(QWidget):
         layout.addWidget(self.plot)
         layout.addWidget(self.plot_button)
         self.setLayout(layout)
+
+
 
     def plot_data(self):
         # clear existing plot data
@@ -39,13 +56,15 @@ class FPS(QWidget):
 
         if not (len(self.y_data)) == 0:
             # add data to plot
-            self.plot.plot(self.x_data, self.y_data)
+            self.plot.addLegend()
+            self.plot.plot(self.x_data, self.y_data, pen=self.pen, brush=self.brush, name='FPS')
             # set fixed limits on x and y axes
 
-            self.plot.setLimits(xMin=self.x_data[0], xMax=self.x_data[-1], yMin=0, yMax=100)
+            self.plot.setLimits(xMin=self.x_data[0], xMax=self.x_data[-1], yMin=0, yMax=100 )
+            font = QFont('Calibri', 10, QFont.Bold)
+            self.legend.setStyle(font=font, textColor='k')
             #self.plot.setMouseEnabled(x=False, y=False)
-            #set plot to display as an image (no scrollbars)
-
+            #set plot to display as an image (no scrollbars)``
 
 class FPS_panel(QWidget):
     def __init__(self, parent):
