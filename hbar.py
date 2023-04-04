@@ -18,7 +18,7 @@ class HorizontalTabBar(QtWidgets.QTabBar):
         painter = QtWidgets.QStylePainter(self)
         option = QtWidgets.QStyleOptionTab()
         for index in range(self.count()):
-            print(index)
+
             self.initStyleOption(option, index)
             painter.drawControl(QtWidgets.QStyle.CE_TabBarTabShape, option)
             painter.drawText(self.tabRect(index),

@@ -38,6 +38,9 @@ class ReadFile(QWidget):
         self.fps_list = []
         self.filter_log=[]
         self.battery_level_list=[]
+        self.x_list = []
+        self.y_list = []
+        self.z_list = []
 
 
         self.pattern = r'(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})\.(\d{3})\s+(\d+)\s+(\d+)\s+([A-Z]+)\s+(.+)'
@@ -68,6 +71,10 @@ class ReadFile(QWidget):
         self.timestamp_list = []
         self.fps_list = []
         self.battery_level_list=[]
+        self.x_list= []
+        self.y_list= []
+        self.z_list= []
+
 
     # compile regular expression pattern
     pattern = re.compile(r'^(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.(\d{3}) (\d+) (\d+) (\S+) (.*)$')
@@ -214,6 +221,53 @@ class ReadFile(QWidget):
                     self.battery_level_list.append(float(blevel))
                     self.timestamp_list.append(float(timestamp))
 
+    def read_file_execute_headpose(self):
+
+        self.set_variables_zero()
+        previous_timestamp = 0
+        offset = 0
+
+
+        for line in self.file_data:
+            if"POSE: x" in line:
+                match = re.match(self.pattern, line)
+                if match:
+                    day = int(match.group(1))
+                    month = int(match.group(2))
+                    hour = int(match.group(3))
+                    minute = int(match.group(4))
+                    second = int(match.group(5))
+                    millisecond = int(match.group(6))
+                    process_id = int(match.group(7))
+                    sub_id = int(match.group(8))
+                    tag = match.group(9)
+                    payload = match.group(10)
+                    #find x,y,z from the pattern RAW POSE: x=0.1 y=0.5 z=0.8
+
+
+                    headpose_match = re.search(r'RAW POSE: x=(-?\d+\.\d+)\s+y=(-?\d+\.\d+)\s+z=(-?\d+\.\d+)', payload)
+                    x = float(headpose_match.group(1))
+                    y = float(headpose_match.group(2))
+                    z = float(headpose_match.group(3))
+
+                    self.x_list.append(x)
+                    self.y_list.append(y)
+                    self.z_list.append(z)
+
+                    timestamp = millisecond + second * 1000 + minute * 60 * 1000 + hour * 60 * 60 * 1000 + offset
+
+                    # Check if current timestamp is more than 100000 less than previous
+                    if timestamp < previous_timestamp - 100000:
+                        offset += 24 * 60 * 60 * 1000
+                        timestamp += 24 * 60 * 60 * 1000
+
+                    # Update previous timestamp to current value
+                    previous_timestamp = timestamp
+
+
+                    # Calculate timestamp
+
+                    self.timestamp_list.append(float(timestamp))
 
 
 
