@@ -34,12 +34,33 @@ class FPS(QWidget):
         self.pen = pg.mkPen(color=(0, 112, 192), width=5)  # red line with width of 2
         self.brush = pg.mkBrush(color=(0, 112, 192))  # blue marker
         # create button to plot data
+        self.hbox= QVBoxLayout()
+
         self.plot_button = QPushButton('Plot Data')
+        self.messagebox = QLabel('No data to plot')
+        #font colur should be red
+
+        self.messagebox.setStyleSheet("QLabel { color : red; }")
+        #add width for hbox
+        self.hbox.setContentsMargins(5, 0, 0, 0)
+
+        self.messagebox.hide()
+
+        self.hbox.addWidget(self.plot_button)
+        self.hbox.addWidget(self.messagebox)
+
+        self.hbox.setAlignment(Qt.AlignCenter | Qt.AlignLeft)
+
+        #create a qlabel below the pus hbutton
+
+
+
         self.plot_button.clicked.connect(self.plot_data)
         # add plot widget and button to layout
         layout = QHBoxLayout()
         layout.addWidget(self.plot)
-        layout.addWidget(self.plot_button)
+        layout.addLayout(self.hbox)
+
         self.setLayout(layout)
 
 
@@ -55,6 +76,8 @@ class FPS(QWidget):
         self.y_data = file_data.fps_list
 
         if not (len(self.y_data)) == 0:
+
+            self.messagebox.hide()
             # add data to plot
             self.plot.addLegend()
             self.plot.plot(self.x_data, self.y_data, pen=self.pen, brush=self.brush, name='FPS')
@@ -62,7 +85,15 @@ class FPS(QWidget):
 
             self.plot.setLimits(xMin=self.x_data[0], xMax=self.x_data[-1], yMin=0, yMax=100 )
             font = QFont('Calibri', 10, QFont.Bold)
-            self.legend.setStyle(font=font, textColor='k')
+            self.legend.setStyle(font=font, textColor='k')\
+
+        else:
+
+            self.messagebox.show()
+
+
+            #add text on the graph around the middle in large letters
+
             #self.plot.setMouseEnabled(x=False, y=False)
             #set plot to display as an image (no scrollbars)``
 
@@ -76,6 +107,7 @@ class FPS_panel(QWidget):
         hbox.addWidget(self.fps_panel)
         vbox.addLayout(hbox)
         self.setLayout(vbox)
+        #set dimenations
 
 class Encoder(QWidget):
     def __init__(self, parent):
@@ -83,15 +115,47 @@ class Encoder(QWidget):
         self.parent = parent
         # create plot widget
         self.plot = pg.PlotWidget()
+        self.plot.setBackground('w')  # set background color to white
         self.plot.setLabel('left', 'Y Axis Label')
         self.plot.setLabel('bottom', 'X Axis Label')
+        # set font for axis labels
+        font = QFont('Calibri', 11, QFont.Bold)
+        self.plot.getAxis('bottom').setTickFont(font)
+        self.plot.getAxis('left').setTickFont(font)
+
+        self.plot.getAxis('bottom').setLabel(text='Timestamp', font=font, color='k')
+        self.plot.getAxis('left').setLabel(text='Encoder', font=font, color='k')
+        # set line color and marker color for plotted data
+        self.pen = pg.mkPen(color=(0, 112, 192), width=5)  # red line with width of 2
+        self.brush = pg.mkBrush(color=(0, 112, 192))  # blue marker
         # create button to plot data
+        self.hbox= QVBoxLayout()
+
         self.plot_button = QPushButton('Plot Data')
+        self.messagebox = QLabel('No data to plot')
+        #font colur should be red
+
+        self.messagebox.setStyleSheet("QLabel { color : red; }")
+        #add width for hbox
+        self.hbox.setContentsMargins(5, 0, 0, 0)
+
+        self.messagebox.hide()
+
+        self.hbox.addWidget(self.plot_button)
+        self.hbox.addWidget(self.messagebox)
+
+        self.hbox.setAlignment(Qt.AlignCenter | Qt.AlignLeft)
+
+        #create a qlabel below the pus hbutton
+
+
+
         self.plot_button.clicked.connect(self.plot_data)
         # add plot widget and button to layout
         layout = QHBoxLayout()
         layout.addWidget(self.plot)
-        layout.addWidget(self.plot_button)
+        layout.addLayout(self.hbox)
+
         self.setLayout(layout)
 
     def plot_data(self):
@@ -106,10 +170,12 @@ class Encoder(QWidget):
 
         if len(self.y_data) == 0:
             # add a text item to the plot if y_data is empty
+            self.messagebox.show()
             pass
 
 
         else:
+            self.messagebox.hide()
             # add data to plot
             self.plot.plot(self.x_data, self.y_data)
             # set fixed limits on x and y axes
@@ -136,15 +202,47 @@ class Decoder(QWidget):
         self.parent = parent
         # create plot widget
         self.plot = pg.PlotWidget()
+        self.plot.setBackground('w')  # set background color to white
         self.plot.setLabel('left', 'Y Axis Label')
         self.plot.setLabel('bottom', 'X Axis Label')
+        # set font for axis labels
+        font = QFont('Calibri', 11, QFont.Bold)
+        self.plot.getAxis('bottom').setTickFont(font)
+        self.plot.getAxis('left').setTickFont(font)
+
+        self.plot.getAxis('bottom').setLabel(text='Timestamp', font=font, color='k')
+        self.plot.getAxis('left').setLabel(text='Decoder', font=font, color='k')
+        # set line color and marker color for plotted data
+        self.pen = pg.mkPen(color=(0, 112, 192), width=5)  # red line with width of 2
+        self.brush = pg.mkBrush(color=(0, 112, 192))  # blue marker
         # create button to plot data
+        self.hbox= QVBoxLayout()
+
         self.plot_button = QPushButton('Plot Data')
+        self.messagebox = QLabel('No data to plot')
+        #font colur should be red
+
+        self.messagebox.setStyleSheet("QLabel { color : red; }")
+        #add width for hbox
+        self.hbox.setContentsMargins(5, 0, 0, 0)
+
+        self.messagebox.hide()
+
+        self.hbox.addWidget(self.plot_button)
+        self.hbox.addWidget(self.messagebox)
+
+        self.hbox.setAlignment(Qt.AlignCenter | Qt.AlignLeft)
+
+        #create a qlabel below the pus hbutton
+
+
+
         self.plot_button.clicked.connect(self.plot_data)
         # add plot widget and button to layout
         layout = QHBoxLayout()
         layout.addWidget(self.plot)
-        layout.addWidget(self.plot_button)
+        layout.addLayout(self.hbox)
+
         self.setLayout(layout)
 
     def plot_data(self):
@@ -159,10 +257,12 @@ class Decoder(QWidget):
 
         if len(self.y_data) == 0:
             # add a text item to the plot if y_data is empty
+            self.messagebox.show()
             pass
 
 
         else:
+            self.messagebox.hide()
             # add data to plot
             self.plot.plot(self.x_data, self.y_data)
             # set fixed limits on x and y axes
