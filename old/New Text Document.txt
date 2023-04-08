@@ -1,0 +1,447 @@
+import sys
+from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtWidgets import *
+#import QTransform
+from PyQt5.QtGui import *
+#imporr qsize
+from PyQt5.QtCore import *
+import subprocess
+
+
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("No Title Bar")
+
+        screen_geomertry = QDesktopWidget().screenGeometry()
+
+        self.setGeometry(screen_geomertry.left(), int((screen_geomertry.top()+screen_geomertry.bottom())/2)-200, 60, 200)
+
+        # Disable title bar
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.super_layout= QHBoxLayout(self)
+
+        # Set initial mouse position to (0, 0)
+
+
+        self.setMinimumSize(74, 400)
+        self.setMaximumSize(74, 400)
+
+        # Create close button
+        self.closeBtn = QToolButton()
+        self.closeBtn.setIcon(self.style().standardIcon(QStyle.SP_TitleBarCloseButton))
+        self.closeBtn.setFixedSize(20, 20)  # set a fixed size for the button
+        self.closeBtn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)  # set the size policy to fixed
+        self.closeBtn.setAutoRaise(True)
+        self.closeBtn.clicked.connect(self.close)
+
+        # Create minimize button
+        self.minimizeBtn = QToolButton()
+        self.minimizeBtn.setIcon(self.style().standardIcon(QStyle.SP_TitleBarMinButton))
+        self.minimizeBtn.setFixedSize(20, 20)  # set a fixed size for the button
+        self.minimizeBtn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)  # set the size policy to fixed
+        #rotate the icon
+
+
+        self.minimizeBtn.setAutoRaise(True)
+        self.minimizeBtn.clicked.connect(self.showMinimized)
+
+        # Create stay on top button
+        self.pinBtn = QToolButton()
+        # Create stay on top button
+        self.pinBtn = QToolButton()
+        self.pinBtn.setIcon(self.style().standardIcon(QStyle.SP_TitleBarNormalButton))
+        self.pinBtn.setFixedSize(20, 20)  # set a fixed size for the button
+        self.pinBtn.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)  # set the size policy to fixed
+        self.pinBtn.setAutoRaise(True)
+        self.pinBtn.setCheckable(True)
+
+
+        self.pinBtn.clicked.connect(self.setStayOnTop)
+
+        # Create push button
+        self.pushButton = QPushButton()
+        self.pushButton.setText(">")
+        self.pushButton.setMinimumSize(20, 200)
+        self.pushButton.setMaximumSize(20, 200)
+        self.pushButton.clicked.connect(self.toggleSize)
+
+        # Create button layout and add buttons
+        buttonLayout = QVBoxLayout()
+        buttonLayout.addWidget(self.closeBtn)
+        buttonLayout.addWidget(self.minimizeBtn)
+        buttonLayout.addWidget(self.pinBtn)
+
+
+
+        # Create move button
+        self.moveBtn = QToolButton()
+
+
+        self.moveBtn.setIcon(self.style().standardIcon(QStyle.SP_TitleBarNormalButton))
+        self.moveBtn.setAutoRaise(True)
+        self.moveBtn.setCheckable(True)
+        self.moveBtn.setChecked(False)
+        self.moveBtn.clicked.connect(self.setMoveMode)
+
+        # Add move button to button layout
+        buttonLayout.addWidget(self.moveBtn)
+
+        # Connect move button mouse events
+
+        # Set initial move mode to False
+        self.moveMode = False
+
+
+        # Create push button layout and add push button
+        pushButtonLayout = QHBoxLayout()
+        pushButtonLayout.addWidget(self.pushButton)
+
+        # Create main layout and add button and push button layouts
+        gui_main_layout = QHBoxLayout()
+        self.mainLayout = QVBoxLayout()
+        self.mainLayout.addLayout(buttonLayout)
+        #add border for layout
+
+        self.mainLayout.addLayout(pushButtonLayout)
+        self.device_count=1
+
+        lineeditLayout = QVBoxLayout()
+
+        self.deviceCountInput = QLineEdit(str(self.device_count))
+        self.deviceCountInput.setMinimumWidth(20)
+        self.deviceCountInput.setMaximumWidth(20)
+
+        self.deviceCountInput.textChanged.connect(self.updateDeviceCount)
+        lineeditLayout.addWidget(self.deviceCountInput)
+        self.mainLayout.addLayout(lineeditLayout)
+        self.mainLayout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+        self.device_layout_main = QHBoxLayout()
+        #add  border for layout
+
+
+        # Create a list of device layouts
+
+        # Rest of the __init__() method code
+
+
+
+
+
+
+
+
+
+
+        # Set button and push button layouts to align to top right corner
+        buttonLayout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+        pushButtonLayout.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+
+        # Set button and push button layouts to have no margins or spacing
+        buttonLayout.setContentsMargins(0, 0, 0, 0)
+        buttonLayout.setSpacing(0)
+        pushButtonLayout.setContentsMargins(0, 0, 0, 0)
+        pushButtonLayout.setSpacing(0)
+        self.mainLayout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+        self.super_layout.addLayout(self.mainLayout)
+        self.super_layout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+
+
+
+        self.setLayout(self.super_layout)
+
+
+        # Set push button to expand when pressed
+        self.expanded = False
+        self.device1 = Deviceone(self)
+
+
+
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        if event.button() == Qt.LeftButton and self.moveMode:
+            self.mousePos = event.globalPos() - self.frameGeometry().topLeft()
+            event.accept()
+
+        # Reimplement mouseMoveEvent to handle move mode
+
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        if event.buttons() == Qt.LeftButton and self.moveMode:
+            self.move(event.globalPos() - self.mousePos)
+            event.accept()
+
+        # Method to set move mode
+
+    def setMoveMode(self, enabled: bool) -> None:
+        self.moveMode = enabled
+        if enabled:
+            self.setCursor(Qt.SizeAllCursor)
+        else:
+            self.setCursor(Qt.ArrowCursor)
+
+    def setStayOnTop(self, enabled):
+        if enabled:
+            self.setWindowFlag(Qt.WindowStaysOnTopHint)
+            self.show()
+        else:
+            self.setWindowFlag(Qt.FramelessWindowHint)
+            self.show()
+
+    def toggleSize(self):
+        print(self.width())
+        if self.width() != 74:
+            self.setMinimumSize(74, 400)
+            self.setMaximumSize(74, 400)
+
+
+
+            self.pushButton.setText(">")
+        else:
+            print("else")
+            if(self.device_count==1):
+                self.setMinimumSize(350, 400)
+                self.setMaximumSize(350, 400)
+
+
+
+                self.device_layout_main.addWidget(self.device1)
+
+                self.super_layout.addLayout(self.device_layout_main)
+                self.super_layout.addLayout(self.mainLayout)
+                self.setLayout(self.super_layout)
+                self.device1.colorLabel.setVisible(True)
+
+
+            elif(self.device_count==2):
+                self.resize(480 , 200)
+
+                self.setMinimumSize(550, 400)
+                self.setMaximumSize(550, 400)
+            elif(self.device_count==3):
+                self.setMinimumSize(900, 400)
+                self.setMaximumSize(900, 400)
+
+            elif(self.device_count==4):
+                self.setMinimumSize(1200, 400)
+                self.setMaximumSize(1200, 400)
+            else:
+                self.resize(60 , 200)
+            self.pushButton.setText("<")
+
+
+
+
+    def updateDeviceCount(self, count_str):
+        try:
+            count = int(count_str)
+            if count >= 0:
+
+                self.device_count = count
+        except ValueError:
+            pass
+
+class Deviceone(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        #create a colur label
+        self.colorLabel = QTextBrowser()
+        #add text
+        self.colorLabel.setText("Device 1")
+
+        self.colorLabel.setAlignment(Qt.AlignLeft | Qt.AlignCenter )
+
+        self.colorLabel.setMinimumSize(100, 100)
+        self.colorLabel.setMaximumSize(100,100)
+
+        self.colorLabel.setAlignment(Qt.AlignLeft | Qt.AlignCenter)
+
+        self.device_layout1=QVBoxLayout()
+
+
+        self.device_layout1.addWidget(self.colorLabel)
+        self.setLayout(self.device_layout1)
+        self.colorLabel.setVisible(False)
+
+
+
+
+To periodically check for new devices in adb devices, you can use the subprocess module to run the command and parse the output. Here is an example function that you can use:
+
+python
+Copy code
+import subprocess
+import time
+
+def check_adb_devices():
+    while True:
+        # Run `adb devices` command and capture output
+        output = subprocess.check_output(['adb', 'devices']).decode()
+
+        # Split output into lines and skip first line (header)
+        devices = output.strip().split('\n')[1:]
+
+        # Create a set of existing devices
+        existing_devices = set([d.name for d in devices_list])
+
+        # Check for new devices
+        for device in devices:
+            name = device.split('\t')[0]
+            if name not in existing_devices:
+                # Create a new device layout
+                device_layout = DeviceLayout(name)
+                devices_list.append(device_layout)
+
+        # Check for removed devices
+        for device in devices_list:
+            if device.name not in [d.split('\t')[0] for d in devices]:
+                # Remove device layout
+                devices_list.remove(device)
+
+        # Wait for 5 seconds before checking again
+        time.sleep(5)
+This function will check for new devices every 5 seconds and create a new device layout for each new device. It will also remove the device layout for any devices that are no longer connected.
+
+You will need to define the DeviceLayout class and devices_list variable that are used in this function. Here is an example DeviceLayout class that you can use:
+
+python
+Copy code
+class DeviceLayout(QWidget):
+    def __init__(self, name):
+        super().__init__()
+
+        # Save device name
+        self.name = name
+
+        # Create layout widgets
+        self.device_label = QLabel(name)
+        self.remove_button = QPushButton('Remove')
+        self.remove_button.clicked.connect(self.remove)
+
+        # Add widgets to layout
+        layout = QHBoxLayout()
+        layout.addWidget(self.device_label)
+        layout.addWidget(self.remove_button)
+        self.setLayout(layout)
+
+    def remove(self):
+        # Remove this layout from parent layout
+        self.parent().removeWidget(self)
+        # Delete this object
+        self.deleteLater()
+This class defines a layout for a single device, with a label showing the device name and a "Remove" button. When the "Remove" button is clicked, the layout is removed from its parent layout and the object is deleted.
+
+You will also need to define the devices_list variable as a list to store all the DeviceLayout objects:
+
+python
+Copy code
+devices_list = []
+Finally, you can call the check_adb_devices function in your MainWindow class to start checking for new devices:
+
+python
+Copy code
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        # Rest of __init__() method code
+
+        # Check for new devices
+        check_thread = threading.Thread(target=check_adb_devices)
+        check_thread.daemon = True
+        check_thread.start()
+This code will start the check_adb_devices function in a separate thread, so that it runs in the background and does not block the main GUI thread.
+
+
+
+
+Athul S Babu
+i need to removee th clas sand layout automatically and not with  aputton
+To automatically remove the class and layout for a device that is no longer detected, you can modify the code to periodically check the list of connected devices using ADB and compare it to the list of existing device classes and layouts. If a device is no longer present, its corresponding class and layout can be removed.
+
+Here's an example implementation:
+
+Modify the MainWindow class to periodically check for connected devices and update the layout:
+python
+Copy code
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        # Rest of the __init__() method code
+
+        # Create a QTimer to periodically update the device layout
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.updateDeviceLayout)
+        self.timer.start(5000)  # Update every 5 seconds
+
+    def updateDeviceLayout(self):
+        # Get the list of connected devices using ADB
+        connected_devices = getConnectedDevices()
+
+        # Check for new devices
+        for device_id in connected_devices:
+            if device_id not in self.device_layouts:
+                # Create a new device layout and add it to the main layout
+                device_layout = DeviceLayout(device_id, self)
+                self.device_layouts[device_id] = device_layout
+                self.device_layout_main.addLayout(device_layout)
+
+        # Check for removed devices
+        removed_devices = []
+        for device_id in self.device_layouts:
+            if device_id not in connected_devices:
+                # Add the device ID to the list of removed devices
+                removed_devices.append(device_id)
+
+        # Remove the layouts for the removed devices
+        for device_id in removed_devices:
+            device_layout = self.device_layouts[device_id]
+            device_layout.setParent(None)
+            del self.device_layouts[device_id]
+
+    # Rest of the MainWindow class code
+Create a new class DeviceLayout to represent the layout for each device:
+ruby
+Copy code
+class DeviceLayout(QHBoxLayout):
+    def __init__(self, device_id, parent=None):
+        super().__init__(parent)
+
+        self.device_id = device_id
+
+        # Create the layout for the device
+        # ...
+
+    # Rest of the DeviceLayout class code
+Modify the getConnectedDevices() function to use the ADB command to get the list of connected devices:
+bash
+Copy code
+def getConnectedDevices():
+    # Run the ADB command to get the list of connected devices
+    result = subprocess.run(['adb', 'devices'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+    # Parse the output to get the list of device IDs
+    lines = result.stdout.strip().split('\n')
+    device_ids = []
+    for line in lines[1:]:
+        parts = line.strip().split('\t')
+        if parts[1] == 'device':
+            device_ids.append(parts[0])
+
+    return device_ids
+With these modifications, the MainWindow class will periodically check for connected devices and update the layout accordingly. If a device is no longer present, its corresponding layout will be removed. Note that you will need to modify the Deviceone class to use the new DeviceLayout class instead of creating a new layout for each device.
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+
+    window = MainWindow()
+    window.show()
+
+    sys.exit(app.exec_())

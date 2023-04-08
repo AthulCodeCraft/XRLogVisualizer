@@ -61,3 +61,7 @@ if __name__ == '__main__':
     w.show()
 
     sys.exit(app.exec_())
+
+
+
+#create a function to find the biggest among 3 numbers

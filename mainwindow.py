@@ -27,14 +27,11 @@ import q6dof_tab as q6dof_tab
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
-
-
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.file_loaded_to_gui=""
+
         self.log_read_object=lr.ReadFile(self)
         self.setWindowTitle("Multi-Screen GUI")
         menu_bar = self.menuBar()
