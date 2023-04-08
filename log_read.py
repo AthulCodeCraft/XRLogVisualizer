@@ -10,7 +10,7 @@ from PyQt5.QtCore import QMimeData
 from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QLabel, QApplication
 import re
-
+from  math import *
 import re
 import numpy as np
 from datetime import datetime
@@ -43,9 +43,41 @@ class ReadFile(QWidget):
         self.z_list = []
 
 
-        self.pattern = r'(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})\.(\d{3})\s+(\d+)\s+(\d+)\s+([A-Z]+)\s+(.+)'
+        self.logcat_log_pattern = r'(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})\.(\d{3})\s+(\d+)\s+(\d+)\s+([A-Z]+)\s+(.+)'
+
+        self.htp_xml_pattern = r"rx='(-?\d+\.\d+)' ry='(-?\d+\.\d+)' rz='(-?\d+\.\d+)' rw='(-?\d+\.\d+)' timestamp='(\d+)' x='(-?\d+\.\d+)' y='(-?\d+\.\d+)' z='(-?\d+\.\d+)' itr='(\d+)' technique='(-?\d+\.\d+)'"
+        self.exposure_ns_pattern = r"exposureNs='(\d+)'"
+        self.iso_gain_pattern =  r"isoGain='(\d+)'"
+        self.metainfo_timestamp_pattern = r"timestamp='(\d+)'"
+        self.metainfo_timestamp_list = []
+        self.isogain_list = []
+        self.exposure_ns_list = []
+        self.tracking_camera_fps_list= []
+
 
         self.file_data = None
+
+        #variables for htp #####################
+        self.htp_rx_list=[]
+        self.htp_ry_list=[]
+        self.htp_rz_list=[]
+        self.htp_rw_list=[]
+        self.htp_timestamp_list=[]
+        self.htp_x_list=[]
+        self.htp_y_list=[]
+        self.htp_z_list=[]
+        self.htp_itr_list=[]
+        self.htp_technique_list=[]
+        self.htp_maximum_value=None
+        self.htp_minimum_value=None
+        self.htp_pitch_list=[]
+        self.htp_roll_list=[]
+        self.htp_yaw_list=[]
+
+
+
+        ########################################
+        
 
 
     def read_file_execute(self,file_path_received):
@@ -98,7 +130,7 @@ class ReadFile(QWidget):
             if "FPS" in line:
 
                 # Extract relevant information from log line
-                match = re.match(self.pattern, line)
+                match = re.match(self.logcat_log_pattern, line)
                 if match:
 
                     day = int(match.group(1))
@@ -188,7 +220,7 @@ class ReadFile(QWidget):
 
             if "BATTERY LEVEL" in line:
                 # Extract relevant information from log line
-                match = re.match(self.pattern, line)
+                match = re.match(self.logcat_log_pattern, line)
                 if match:
 
                     day = int(match.group(1))
@@ -230,7 +262,7 @@ class ReadFile(QWidget):
 
         for line in self.file_data:
             if"POSE: x" in line:
-                match = re.match(self.pattern, line)
+                match = re.match(self.logcat_log_pattern, line)
                 if match:
                     day = int(match.group(1))
                     month = int(match.group(2))
@@ -269,8 +301,153 @@ class ReadFile(QWidget):
 
                     self.timestamp_list.append(float(timestamp))
 
+    def clear_htp_variables(self):
+        self.htp_rx_list=[]
+        self.htp_ry_list=[]
+        self.htp_rz_list=[]
+        self.htp_rw_list=[]
+        self.htp_x_list=[]
+        self.htp_y_list=[]
+        self.htp_z_list=[]
+        self.htp_technique_list=[]
+        self.htp_timestamp_list=[]
+        self.htp_pitch_list=[]
+        self.htp_yaw_list=[]
+        self.htp_roll_list=[]
 
 
+    def read_head_tracking_pose_xml(self):
+        print("htp file is read")
+        self.clear_htp_variables()
+        total_lines = len(self.file_data)
+        current_line = 0
+        htp_match_flag= False
+        self.parent.progress_bar_read.setStyleSheet("QProgressBar::chunk {background-color: #6767ff;}")
+
+        for line in self.file_data:
+            current_line += 1
+            matches = re.search(self.htp_xml_pattern, line)
+
+            if matches:
+                htp_match_flag=True
+
+                htp_rx, htp_ry, htp_rz, htp_rw = map(float, matches.group(1, 2, 3, 4))
+                htp_x, htp_y, htp_z = map(float, matches.group(6, 7, 8))
+                htp_technique = float(matches.group(10))
+                htp_timestamp = int(matches.group(5))
+
+                htp_pitch = atan2(2 * (htp_rw * htp_rx + htp_ry * htp_rz), 1 - 2 * (htp_rx * htp_rx + htp_ry * htp_ry))
+                htp_yaw = asin(2 * (htp_rw * htp_ry - htp_rz * htp_rx))
+                htp_roll = atan2(2 * (htp_rw * htp_rz + htp_rx * htp_ry), 1 - 2 * (htp_ry * htp_ry + htp_rz * htp_rz))
+
+
+
+                progress_value = int(current_line / total_lines * 100)
+
+                self.parent.progress_bar_read.setValue(progress_value)
+
+
+                self.htp_rx_list.append(htp_rx)
+                self.htp_ry_list.append(htp_ry)
+                self.htp_rz_list.append(htp_rz)
+                self.htp_rw_list.append(htp_rw)
+                self.htp_x_list.append(htp_x)
+                self.htp_y_list.append(htp_y)
+                self.htp_z_list.append(htp_z)
+                self.htp_technique_list.append(htp_technique)
+                self.htp_timestamp_list.append(htp_timestamp)
+                self.htp_pitch_list.append(htp_pitch)
+                self.htp_yaw_list.append(htp_yaw)
+                self.htp_roll_list.append(htp_roll)
+                #find the maximum value of multiple list
+
+
+
+
+
+
+        if htp_match_flag==True:
+            self.parent.progress_bar_read.setValue(100)
+            self.htp_maximum_value=max(max(self.htp_x_list),max(self.htp_y_list),max(self.htp_z_list))
+            self.htp_minimum_value=min(min(self.htp_x_list),min(self.htp_y_list),min(self.htp_z_list))
+
+
+
+        self.parent.progress_bar_read.setStyleSheet("QProgressBar::chunk {background-color: ##67ff67;}")
+
+
+
+
+
+    def clear_metainfo_variables(self):
+        self.metainfo_timestamp_list=[]
+        self.isogain_list=[]
+        self.exposure_ns_list=[]
+        self.tracking_camera_fps_list = []
+
+
+
+
+
+    def read_meta_info_xml(self):
+
+        self.clear_metainfo_variables()
+        total_lines = len(self.file_data)
+        current_line = 0
+        metainfo_match_flag= False
+        self.parent.progress_bar_read.setStyleSheet("QProgressBar::chunk {background-color: #6767ff;}")
+        previous_timestamp=0
+
+        for line in self.file_data:
+            current_line += 1
+
+            exposure_ns_match = re.search(self.exposure_ns_pattern, line)
+            io_gain_match = re.search(self.iso_gain_pattern, line)
+            timestamp_match = re.search(self.metainfo_timestamp_pattern, line)
+
+            if (timestamp_match):
+                print("Metainfo match found")
+
+                metainfo_match_flag=True
+                exposure_ns = int(exposure_ns_match.group(1))
+                iso_gain = int(io_gain_match.group(1))
+                timestamp = int(timestamp_match.group(1))
+
+                tracking_camera_fps = float(1000000000 / (timestamp - previous_timestamp))
+
+                print(tracking_camera_fps)
+
+
+
+
+
+
+                progress_value = int(current_line / total_lines * 100)
+                self.parent.progress_bar_read.setValue(progress_value)
+
+                self.exposure_ns_list.append(exposure_ns)
+                self.isogain_list.append(iso_gain)
+                self.metainfo_timestamp_list.append(timestamp)
+                self.tracking_camera_fps_list.append(tracking_camera_fps)
+
+                previous_timestamp = timestamp
+
+                #find the maximum value of multiple list
+
+
+
+
+
+
+        if metainfo_match_flag==True:
+            self.parent.progress_bar_read.setValue(100)
+            self.metainfo_exposure_maximum_value=max(self.exposure_ns_list)
+            self.metainfo_exposure_minimum_value=min(self.exposure_ns_list)
+            self.metainfo_iso_gain_maximum_value=max(self.isogain_list)
+            self.metainfo_iso_gain_minimum_value=min(self.isogain_list)
+
+
+        self.parent.progress_bar_read.setStyleSheet("QProgressBar::chunk {background-color: ##67ff67;}")
 
 #default main funcion
 

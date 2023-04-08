@@ -1,0 +1,7 @@
+<Frame filename='1234567890.pgm' timestamp='327456098335' nBytes='614400' exposureNs='4532' isoGain='714' fromat='1' 
+<Frame filename='1234567890.pgm' timestamp='327472760939' nBytes='614400' exposureNs='2532' isoGain='74' fromat='1' 
+<Frame filename='1234567890.pgm' timestamp='327489423564' nBytes='614400' exposureNs='4132' isoGain='744' fromat='1' 
+<Frame filename='1234567890.pgm' timestamp='327506094947' nBytes='614400' exposureNs='7532' isoGain='334' fromat='1' 
+<Frame filename='1234567890.pgm' timestamp='327522748751' nBytes='614400' exposureNs='9532' isoGain='744' fromat='1' 
+<Frame filename='1234567890.pgm' timestamp='327539411355' nBytes='614400' exposureNs='4532' isoGain='724' fromat='1' 
+<Frame filename='1234567890.pgm' timestamp='327556073959' nBytes='614400' exposureNs='4532' isoGain='74' fromat='1' 
