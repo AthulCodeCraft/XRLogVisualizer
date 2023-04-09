@@ -25,27 +25,27 @@ class HorizontalTabBar(QtWidgets.QTabBar):
                              QtCore.Qt.AlignCenter | QtCore.Qt.TextDontClip,
                              self.tabText(index))
             if index == 0:
-                painter.drawImage(QtCore.QRectF(10, 20, 30, 30), QtGui.QImage("thumbnail/1i.webp"))
+                painter.drawImage(QtCore.QRectF(10, 15,40, 40), QtGui.QImage("thumbnail/Img/img1.webp"))
             elif index == 1:
-                painter.drawImage(QtCore.QRectF(10, 90, 30, 30), QtGui.QImage("thumbnail/2i.webp"))
+                painter.drawImage(QtCore.QRectF(10, 85, 40, 40), QtGui.QImage("thumbnail/Img/img2.webp"))
             elif index == 2:
-                painter.drawImage(QtCore.QRectF(10, 160, 30, 30), QtGui.QImage("thumbnail/3i.webp"))
+                painter.drawImage(QtCore.QRectF(10, 155, 40, 40), QtGui.QImage("thumbnail/Img/img3.webp"))
             elif index == 3:
-                painter.drawImage(QtCore.QRectF(10, 230, 30, 30), QtGui.QImage("thumbnail/4i.png"))
+                painter.drawImage(QtCore.QRectF(10, 220, 40, 40), QtGui.QImage("thumbnail/Img/img4.png"))
             elif index == 4:
-                painter.drawImage(QtCore.QRectF(10, 300, 30, 30), QtGui.QImage("thumbnail/5i.png"))
+                painter.drawImage(QtCore.QRectF(10, 300, 40, 40), QtGui.QImage("thumbnail/Img/img5.png"))
             elif index == 5:
-                painter.drawImage(QtCore.QRectF(10, 370, 30, 30), QtGui.QImage("thumbnail/6i.png"))
+                painter.drawImage(QtCore.QRectF(10, 365, 40, 40), QtGui.QImage("thumbnail/Img/img6.png"))
             elif index == 6:
-                painter.drawImage(QtCore.QRectF(10, 440,30, 30), QtGui.QImage("thumbnail/7i.webp"))
+                painter.drawImage(QtCore.QRectF(10, 440, 40, 40), QtGui.QImage("thumbnail/Img/img7.webp"))
             elif index == 7:
-                painter.drawImage(QtCore.QRectF(10, 510, 30, 30), QtGui.QImage("thumbnail/8i.png"))
+                painter.drawImage(QtCore.QRectF(10, 505, 40, 40), QtGui.QImage("thumbnail/Img/img8.png"))
             elif index == 8:
-                painter.drawImage(QtCore.QRectF(10, 580, 30, 30), QtGui.QImage("thumbnail/9i.png"))
+                painter.drawImage(QtCore.QRectF(10, 572, 40, 40), QtGui.QImage("thumbnail/Img/img9.png"))
             elif index == 9:
-                painter.drawImage(QtCore.QRectF(10, 650, 30, 30), QtGui.QImage("thumbnail/10i.png"))
+                painter.drawImage(QtCore.QRectF(10, 643, 40, 40), QtGui.QImage("thumbnail/Img/img10.png"))
             elif index == 10:
-                painter.drawImage(QtCore.QRectF(10, 720, 30, 30), QtGui.QImage("thumbnail/11i.png"))
+                painter.drawImage(QtCore.QRectF(10, 715, 40, 40), QtGui.QImage("thumbnail/Img/img11.png"))
 
 
     def tabSizeHint(self, index):

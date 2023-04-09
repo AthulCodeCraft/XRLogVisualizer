@@ -100,13 +100,13 @@ class MainWindow(QMainWindow):
         tab_widget.addTab(widget7, "Memory")
         tab_widget.addTab(widget8, "GPU")
         tab_widget.addTab(widget9, "Wi-Fi")
-        tab_widget.addTab(widget10, "Usecases")
+        tab_widget.addTab(widget10, "PP")
         tab_widget.addTab(widget11, "Controllers")
 
 
 
             #provide colur for seletc tabs nd height ,width
-        tab_widget.setStyleSheet("QTabBar { font-size: 16px; font-family: Calibri; } QTabBar::tab { height: 70px; width: 200px; font-size: 14px; font-family: Calibri; } QTabBar::tab:selected { background: #cee7ff; } QTabBar::tab { SetAlignment(Qt.AlignLeft); }")
+        tab_widget.setStyleSheet("QTabBar { font-size: 16px; font-family: Calibri; } QTabBar::tab { height: 70px; width: 200px; font-size: 15px; font-family: Calibri; } QTabBar::tab:selected { background: #cee7ff; } QTabBar::tab { SetAlignment(Qt.AlignLeft); }")
 
         #allignntext to left
 
