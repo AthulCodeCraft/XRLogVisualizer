@@ -44,6 +44,8 @@ class HorizontalTabBar(QtWidgets.QTabBar):
                 painter.drawImage(QtCore.QRectF(10, 580, 30, 30), QtGui.QImage("thumbnail/9i.png"))
             elif index == 9:
                 painter.drawImage(QtCore.QRectF(10, 650, 30, 30), QtGui.QImage("thumbnail/10i.png"))
+            elif index == 10:
+                painter.drawImage(QtCore.QRectF(10, 720, 30, 30), QtGui.QImage("thumbnail/11i.png"))
 
 
     def tabSizeHint(self, index):

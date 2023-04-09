@@ -86,7 +86,7 @@ class Scan_n_Edit(QLabel):
 
                     if tag in line:
                         colured_line=f"<font color={self.colour_list[i]}>{line}</font><br>"
-                        break
+
                 filter_log_colured.append(colured_line)
 
 

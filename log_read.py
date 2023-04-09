@@ -253,17 +253,26 @@ class ReadFile(QWidget):
                     self.battery_level_list.append(float(blevel))
                     self.timestamp_list.append(float(timestamp))
 
+
+
     def read_file_execute_headpose(self):
 
         self.set_variables_zero()
+        total_lines = len(self.file_data)
         previous_timestamp = 0
         offset = 0
+        self.parent.progress_bar_read.setStyleSheet("QProgressBar::chunk {background-color: #6767ff;}")
+        current_line = 0
+        headpose_6dof_match_flag=False
 
 
         for line in self.file_data:
+            current_line += 1
             if"POSE: x" in line:
+
                 match = re.match(self.logcat_log_pattern, line)
                 if match:
+                    headpose_6dof_match_flag=True
                     day = int(match.group(1))
                     month = int(match.group(2))
                     hour = int(match.group(3))
@@ -286,6 +295,10 @@ class ReadFile(QWidget):
                     self.y_list.append(y)
                     self.z_list.append(z)
 
+                    progress_value = int(current_line / total_lines * 100)
+
+                    self.parent.progress_bar_read.setValue(progress_value)
+
                     timestamp = millisecond + second * 1000 + minute * 60 * 1000 + hour * 60 * 60 * 1000 + offset
 
                     # Check if current timestamp is more than 100000 less than previous
@@ -300,6 +313,17 @@ class ReadFile(QWidget):
                     # Calculate timestamp
 
                     self.timestamp_list.append(float(timestamp))
+
+        if headpose_6dof_match_flag==True:
+            self.parent.progress_bar_read.setValue(100)
+            self.headpose_6dof_maximum_value=max(max(self.x_list),max(self.y_list),max(self.z_list))
+            self.headpose_6dof_minimum_value=min(min(self.x_list),min(self.y_list),min(self.z_list))
+
+
+        self.parent.progress_bar_read.setStyleSheet("QProgressBar::chunk {background-color: ##67ff67;}")
+
+
+
 
     def clear_htp_variables(self):
         self.htp_rx_list=[]

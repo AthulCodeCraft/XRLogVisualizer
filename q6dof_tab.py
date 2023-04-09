@@ -21,34 +21,43 @@ class Headpose(QWidget):
         super().__init__(parent)
         self.parent = parent
         file_data = self.parent.parent.parent.log_read_object
+        self.hbox = QVBoxLayout()
+
+        layout = QHBoxLayout()
 
         self.fig = plt.Figure()
         self.ax = self.fig.add_subplot(111, projection='3d')
         self.canvas = FigureCanvas(self.fig)
-
         self.x = []
         self.y = []
         self.z = []
         self.timestamps = []
-
         # Animate the plot widget
-
         self.plot_widget = QTabWidget()
 
-        self.push_button = QPushButton('Plot Data')
-        self.push_button.clicked.connect(self.plot_data)
+        self.plot_button = QPushButton('Plot Data')
+        #set the size
+        self.plot_button.setFixedWidth(100)
 
-        layout = QHBoxLayout()
+
+        self.messagebox = QLabel('No data to plot')
+        #font colur should be red
+        self.messagebox.setFixedWidth(100)
+        self.messagebox.setFixedHeight(20)
+
+        self.messagebox.setStyleSheet("QLabel { color : red; }")
+        #add width for hbox
+        self.hbox.setContentsMargins(5, 0, 0, 0)
+        self.messagebox.hide()
+        self.hbox.addWidget(self.plot_button)
+        self.hbox.addWidget(self.messagebox)
+        self.hbox.setAlignment(Qt.AlignVCenter)
+
+        self.plot_button.clicked.connect(self.plot_data)
         layout.addWidget(self.canvas)
-        self.push_button.setMaximumSize(100,50)
-        layout.addWidget(self.push_button)
+        layout.addLayout(self.hbox)
         self.setLayout(layout)
-
-        self.animation = FuncAnimation(self.fig, self.animate,
-                                       frames=0, interval=10)
-
-
-
+        self.animation = FuncAnimation(self.fig, self.animate,frames=0, interval=10)
     def add_data(self, x_list, y_list, z_list, timestamps_list):
         self.x.extend(x_list)
         self.y.extend(y_list)
@@ -70,9 +79,9 @@ class Headpose(QWidget):
             self.ax.set_ylabel('Y')
             self.ax.set_zlabel('Z')
 
-            self.ax.set_xlim([-1, 1])
-            self.ax.set_ylim([-1, 1])
-            self.ax.set_zlim([-1, 1])
+            self.ax.set_xlim([ self.canvas_limit_min, self.canvas_limit_max])
+            self.ax.set_ylim([self.canvas_limit_min, self.canvas_limit_max])
+            self.ax.set_zlim([self.canvas_limit_min, self.canvas_limit_max])
 
             '''
 
@@ -101,11 +110,16 @@ class Headpose(QWidget):
         file_data.read_file_execute_headpose()
         self.add_data(file_data.x_list, file_data.y_list, file_data.z_list, file_data.timestamp_list)
 
-        if len(self.x) == 0:
+
+        if len(file_data.x_list) == 0:
             # add a text item to the plot if x_data is empty
-            pass
+            self.messagebox.show()
+
+
         else:
             # update plot data
+            self.canvas_limit_max = file_data.headpose_6dof_maximum_value
+            self.canvas_limit_min = file_data.headpose_6dof_minimum_value
             self.animation = FuncAnimation(self.fig, self.animate,
                                            frames=len(self.timestamps), interval=1)
             #ADD A COLUR TO THE FLOOR OF THE CANVAS

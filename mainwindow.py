@@ -22,6 +22,7 @@ import multimedia_tab as multimedia_tab
 import data_tab as data_tab
 import pvr_tab as pvr_tab
 import q6dof_tab as q6dof_tab
+import wip as wip_tab
 
 
 
@@ -77,12 +78,16 @@ class MainWindow(QMainWindow):
         widget3=(pvr_tab.PVR_tab(self))
         widget4=(q6dof_tab.Q6DOF_tab(self))
 
-        widget5 = (pvr_tab.PVR_tab(self))
-        widget6 = (pvr_tab.PVR_tab(self))
-        widget7 = (pvr_tab.PVR_tab(self))
-        widget8 = (pvr_tab.PVR_tab(self))
-        widget9 = (pvr_tab.PVR_tab(self))
-        widget10 = (pvr_tab.PVR_tab(self))
+        widget5 = (wip_tab.WIP(self))
+        widget6 = (wip_tab.WIP(self))
+        widget7 = (wip_tab.WIP(self))
+        widget8 = (wip_tab.WIP(self))
+        widget9 = (wip_tab.WIP(self))
+        widget10 = (wip_tab.WIP(self))
+        widget11 = (wip_tab.WIP(self))
+
+
+
 
 
 
@@ -95,10 +100,8 @@ class MainWindow(QMainWindow):
         tab_widget.addTab(widget7, "Memory")
         tab_widget.addTab(widget8, "GPU")
         tab_widget.addTab(widget9, "Wi-Fi")
-        #change the font size of the tabs
-
-        
         tab_widget.addTab(widget10, "Usecases")
+        tab_widget.addTab(widget11, "Controllers")
 
 
 

@@ -221,21 +221,13 @@ class Decoder(QWidget):
         self.plot_button = QPushButton('Plot Data')
         self.messagebox = QLabel('No data to plot')
         #font colur should be red
-
         self.messagebox.setStyleSheet("QLabel { color : red; }")
-        #add width for hbox
+
         self.hbox.setContentsMargins(5, 0, 0, 0)
-
         self.messagebox.hide()
-
         self.hbox.addWidget(self.plot_button)
         self.hbox.addWidget(self.messagebox)
-
         self.hbox.setAlignment(Qt.AlignCenter | Qt.AlignLeft)
-
-        #create a qlabel below the pus hbutton
-
-
 
         self.plot_button.clicked.connect(self.plot_data)
         # add plot widget and button to layout
@@ -283,6 +275,30 @@ class Decoder_panel(QWidget):
         self.setLayout(vbox)
 
 
+class WIP_Panel_Tab1(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        layout = QHBoxLayout()
+        self.messagebox = QLabel("Coming soon, Work in progress")
+        self.messagebox.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.messagebox)
+        self.setLayout(layout)
+
+class WIP_Panel(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        self.wip_panel_tab1 = WIP_Panel_Tab1(self)
+        vbox = QVBoxLayout()
+        hbox = QHBoxLayout()
+        hbox.addWidget(self.wip_panel_tab1)
+        vbox.addLayout(hbox)
+        self.setLayout(vbox)
+
+
+
+
 class Multimedia_tab(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
@@ -294,8 +310,8 @@ class Multimedia_tab(QWidget):
 
         ####################################Add the panels here###################################################
         multimedia_tab_widget.addTab(FPS_panel(self), "FPS")
-        multimedia_tab_widget.addTab(Decoder_panel(self), "Decoder")
-        multimedia_tab_widget.addTab(Encoder_panel(self), "Encoder")
+        multimedia_tab_widget.addTab(WIP_Panel(self), "Decoder")
+        multimedia_tab_widget.addTab(WIP_Panel(self), "Encoder")
         ##########################################################################################################
 
         main_layout = QVBoxLayout()
