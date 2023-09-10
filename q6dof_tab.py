@@ -57,7 +57,7 @@ class Headpose(QWidget):
         layout.addWidget(self.canvas)
         layout.addLayout(self.hbox)
         self.setLayout(layout)
-        self.animation = FuncAnimation(self.fig, self.animate,frames=0, interval=10)
+        self.animation = FuncAnimation(self.fig, self.animate,frames=0, interval=1)
     def add_data(self, x_list, y_list, z_list, timestamps_list):
         self.x.extend(x_list)
         self.y.extend(y_list)
